@@ -84,8 +84,6 @@ namespace CMS.Client.Controllers
                 });
         }
 
-
-
         [HttpGet]
         public IActionResult Logout()
         {

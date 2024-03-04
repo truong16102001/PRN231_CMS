@@ -15,7 +15,6 @@ namespace CMS.Client.Controllers
         private readonly IConfiguration _configuration;
         private readonly HttpClient client = null;
         private string BaseUrl = "";
-        private string DefaultAuthenticatesApiUrl = "";
         private readonly CommonFunctions _commonFunctions;
         public HomeController(IConfiguration configuration, CommonFunctions commonFunctions)
         {
@@ -23,7 +22,6 @@ namespace CMS.Client.Controllers
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
             BaseUrl = "https://localhost:7149";
-            DefaultAuthenticatesApiUrl = "https://localhost:7149/api/Authenticates";
             _configuration = configuration;
             _commonFunctions = commonFunctions;
         }
