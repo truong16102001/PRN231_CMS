@@ -1,0 +1,30 @@
+﻿body {
+    background-image: url(https://cmshn.fpt.edu.vn/pluginfile.php/1/theme_trema/loginbackgroundimage/1697438386/sanhAlpha2.jpg);
+    background-position: top center;
+    background-repeat: no-repeat;
+    -webkit-background-size: cover;
+    background-size: cover;
+    height: auto;
+}
+
+#maincontent {
+    display: block;
+    height: 1px;
+    overflow: hidden;
+}
+
+#card-login, body#page-login-index #card-login-instructions {
+    margin-top: 50px;
+}
+
+.card-header {
+    background-color: transparent;
+}
+
+#page h2 {
+    font-weight: 400;
+    font-size: 1.75rem;
+    line-height: 2rem;
+}
+
+
