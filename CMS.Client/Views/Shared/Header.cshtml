@@ -1,39 +1,153 @@
-﻿<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container-fluid">
-            <a href="/" class="navbar-brand has-logo">
-                <span class="logo d-inline">
-                    <img src="https://cmshn.fpt.edu.vn/pluginfile.php/1/core_admin/logocompact/0x70/1697438386/2020-FPTU-Eng.png" alt="eLearning">
-                </span>
+﻿<link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+
+
+<nav class="sb-topnav navbar navbar-expand navbar-light bg-light fixed-top">
+    <div class="container-fluid ">
+        <nav class="navbar navbar-light bg-light">
+            <a class="navbar-brand " href="/">
+                <img src="https://cmshn.fpt.edu.vn/pluginfile.php/1/core_admin/logocompact/0x70/1697438386/2020-FPTU-Eng.png"
+                     width="100" height="30" class="d-inline-block align-top" alt="">
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                @if (Context.Request.Cookies["refreshToken"] is null)
-                {
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item ">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Authenticate" asp-action="Login">
-                                <i class="fa fa-unlock-alt" aria-hidden="true"></i> Log In
-                            </a>
-                        </li>
-                    </ul>
-                }
-                else
-                {
-                    @if (Context.Request.Cookies["accessToken"] is not null)
+        </nav>
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!">
+            <i class="fas fa-bars"></i>
+        </button>
+        <button class="navbar-toggler " type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse ms-5" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 1000px">
+
+                @{
+                    var userJson = Context.Session.GetString("user");
+
+                    var refreshTokenExpiration_raw = Context.Request.Cookies["refreshTokenExpires"];
+                    var refreshTokenExpiration = DateTime.UtcNow;
+                    if (!string.IsNullOrEmpty(refreshTokenExpiration_raw))
                     {
-                        <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item "> <a href="/Accounts/Profile"><i class="fa fa-user" aria-hidden="true"></i> Profile </a></li>
-                            <li class="nav-item "> <a href="/Authenticate/Logout"><i class="fa fa-sign-out"></i> Logout</a> </li>
-                        </ul>
+                        refreshTokenExpiration = Convert.ToDateTime(refreshTokenExpiration_raw.ToString());
+                    }
+
+                    var refreshToken = Context.Request.Cookies["refreshToken"];
+                    var accessToken = Context.Request.Cookies["accessToken"];
+                    var accessTokenExpiration_raw = Context.Request.Cookies["accessTokenExpires"];
+                    var accessTokenExpiration = DateTime.UtcNow;
+                    if (!string.IsNullOrEmpty(accessTokenExpiration_raw))
+                    {
+                        accessTokenExpiration = Convert.ToDateTime(accessTokenExpiration_raw.ToString());
                     }
                 }
 
-            </div>
+                @if (refreshToken is null || refreshTokenExpiration <= DateTime.UtcNow || string.IsNullOrEmpty(userJson))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Authenticate" asp-action="Login">
+                            <i class="fa fa-unlock-alt" aria-hidden="true"></i> LOGIN
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    Console.WriteLine("rf not null and rf not expired");
+
+                    if (!string.IsNullOrEmpty(accessToken) && Convert.ToDateTime(accessTokenExpiration_raw) > DateTime.UtcNow)
+                    {
+                        dynamic user = Newtonsoft.Json.JsonConvert.DeserializeObject(userJson);
+                        <div class="btn-group">
+                            <button type="button" style="border-radius: 4px"
+                            class="btn btn-outline-dark dropdown-toggle py-2 px-4" data-toggle="dropdown"
+                            aria-expanded="false">
+                                <span class="font-weight-bold" style="font-size: 16px"> @user.fullName</span>
+                            </button>
+                            <ul class="dropdown-menu menuScroll">
+                                <li class="nav-item ">
+                                    <a href="/Accounts/Profile" class="text-black">
+                                        <i class="fa fa-user" aria-hidden="true"></i> Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="Authenticate/Logout">Đăng xuất</a>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        Console.WriteLine("access null or expired access");
+                    }
+                }
+            </ul>
         </div>
-    </nav>
-</header>
+    </div>
+</nav>
+
+<script>
+    // Hàm để kiểm tra thời gian hết hạn của accessToken
+    function checkAccessTokenExpiration() {
+        // Hàm để lấy giá trị từ cookie
+        function getCookie(name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+            if (parts.length == 2) return parts.pop().split(";").shift();
+        }
+
+        var accessTokenExpiration = getCookie('accessTokenExpires');
+
+        accessTokenExpiration = new Date(accessTokenExpiration);
+
+        // Kiểm tra nếu accessToken đã hết hạn
+        if (accessTokenExpiration <= new Date()) {
+            // Gọi hàm refreshToken để cập nhật accessToken
+            refreshToken();
+        }
+    }
+
+    // Hàm gọi API refreshToken
+    function refreshToken() {
+        // Lưu ý: Cần thay đổi URL và dữ liệu gửi đi cho phù hợp với API của bạn
+        var refreshToken = getCookie('refreshToken');
+        $.ajax({
+            url: "https://localhost:7149/api/Authenticates/refreshToken",
+            type: "POST",
+            dataType: 'json',
+            contentType: "application/json",
+            data: JSON.stringify({ refreshToken: refreshToken }), // Dữ liệu gửi đi là refreshToken
+            success: function (response) {
+                var newAccessToken = response.accessToken;
+                var newAccessTokenExpiration = response.accessTokenExpires;
+
+                // Cập nhật lại accessToken và thời gian hết hạn của accessToken lên cookie
+                document.cookie = "accessToken=" + newAccessToken + "; path=/";
+                document.cookie = "accessTokenExpires=" + newAccessTokenExpiration + "; path=/";
+
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error refreshing token:", error);
+                redirectToHome(); // Chuyển hướng người dùng về trang chủ nếu refreshToken không thành công
+            }
+        });
+    }
+
+    // Hàm chuyển hướng người dùng về trang chủ
+    function redirectToHome() {
+        window.location.href = '/Authenticate/Login'; // Đường dẫn trang chủ của ứng dụng
+    }
+
+    $(document).ready(function () {
+        // Kiểm tra thời gian hết hạn của accessToken mỗi 5 phút
+        setInterval(checkAccessTokenExpiration, 5 * 60 * 1000); // Đơn vị tính là milliseconds
+    });
+</script>
+
+
+

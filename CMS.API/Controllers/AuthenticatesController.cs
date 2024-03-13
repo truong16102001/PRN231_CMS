@@ -67,11 +67,12 @@ namespace CMS.API.Controllers
 
             DateTime expiresAccessToken = accesstoken.ValidTo;
 
+
             //Handle when refreshtoken existed
             var existedToken = await _tokenService.GetRefreshTokenByUserId(user.UserId);
 
             string newRefreshToken = "";
-            DateTime expiredTime = DateTime.Now;
+            DateTime expiredTime = DateTime.UtcNow;
 
             if (existedToken == null || string.IsNullOrEmpty(existedToken.Token) || existedToken.ExpirationTime <= DateTime.Now)
             {
@@ -86,10 +87,9 @@ namespace CMS.API.Controllers
             }
 
             userInfo.AccessToken = new JwtSecurityTokenHandler().WriteToken(accesstoken);
-            userInfo.AccessTokenExpires = expiresAccessToken;
             userInfo.RefreshToken = newRefreshToken;
             userInfo.RefreshTokenExpires = expiredTime;
-
+            userInfo.AccessTokenExpires = expiresAccessToken;
 
             return StatusCode(200, new ApiResponse
             {
@@ -120,14 +120,14 @@ namespace CMS.API.Controllers
             string? accessToken = userLoginInfo.AccessToken;
             string? refreshToken = userLoginInfo.RefreshToken;
 
-            var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
+            var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken ?? userInfo.AccessToken);
 
             string userId = principal.FindFirst("UserId").Value;
 
 
             var existedToken = await _tokenService.GetRefreshTokenByUserId(int.Parse(userId));
             // invalid user || invalid refresh token
-            if (existedToken == null ||  existedToken.Token != refreshToken)
+            if (existedToken == null || existedToken.Token != refreshToken)
             {
                 return BadRequest("Refresh Token is not existed in db or token is expired");
             }
@@ -136,15 +136,14 @@ namespace CMS.API.Controllers
             string newRefreshToken = existedToken.Token;
             DateTime expiredTime = (DateTime)existedToken.ExpirationTime;
 
-            if (expiredTime <= DateTime.Now)
+            if (expiredTime <= DateTime.UtcNow)
             {
                 newRefreshToken = _tokenService.GenerateRefreshToken();
                 expiredTime = DateTime.Now.AddMinutes(int.Parse(_configuration["JWT:RefreshTokenValidityInMinutes"]));
                 await _tokenService.SaveRefreshToken(existedToken.UserId, newRefreshToken, expiredTime);
             }
-
             userInfo.RefreshToken = newRefreshToken;
-            userInfo.AccessToken= new JwtSecurityTokenHandler().WriteToken( newAccessToken);
+            userInfo.AccessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken);
             userInfo.RefreshTokenExpires = expiredTime;
             userInfo.AccessTokenExpires = newAccessToken.ValidTo;
 

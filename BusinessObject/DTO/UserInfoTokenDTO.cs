@@ -9,7 +9,7 @@ namespace BusinessObject.DTO
 {
     public class UserInfoTokenDTO
     {
-        public User User { get; set; }
+        public User? User { get; set; }
         public string? AccessToken { get; set; }
         public string? RefreshToken { get; set; }
 

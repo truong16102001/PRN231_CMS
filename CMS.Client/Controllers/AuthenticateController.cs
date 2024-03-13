@@ -31,7 +31,6 @@ namespace CMS.Client.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-         
             return View();
         }
 
@@ -55,14 +54,14 @@ namespace CMS.Client.Controllers
                 var expirationAccessToken = data["accessTokenExpires"].ToString();
                 var expirationRefreshToken = data["refreshTokenExpires"].ToString();
 
-
                 // Lưu thông tin người dùng vào session
                 HttpContext.Session.SetString("user", JsonConvert.SerializeObject(data["user"]));
 
-                SetCookies("accessToken", accessToken);
-                SetCookies("refreshToken", refreshToken);
-                SetCookies("accessTokenExpires", expirationAccessToken.ToString());
-                SetCookies("refreshTokenExpires", expirationRefreshToken.ToString());
+                SetCookies("accessToken", accessToken, DateTime.MaxValue);
+                SetCookies("accessTokenExpires", expirationAccessToken, DateTime.MaxValue);
+
+                SetCookies("refreshToken", refreshToken, DateTime.MaxValue);
+                SetCookies("refreshTokenExpires", expirationRefreshToken, DateTime.MaxValue);
 
                 return RedirectToAction("Index", "Home");
 
@@ -73,16 +72,18 @@ namespace CMS.Client.Controllers
             }
         }
 
-        public void SetCookies(string variable, string value)
+        public void SetCookies(string variable, string value, DateTime expires)
         {
             Response.Cookies.Append(variable, value,
                 new CookieOptions
                 {
-                    Expires = DateTime.MaxValue,
+                    Expires = expires,
                     HttpOnly = true,
-                    SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict
+                    SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
+                    Secure = true // Ensure cookie is sent only over HTTPS
                 });
         }
+
 
         [HttpGet]
         public IActionResult Logout()
