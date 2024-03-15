@@ -1,0 +1,92 @@
+﻿@{
+    ViewData["Title"] = "LeftBoard";
+}
+
+<style>
+    body {
+        margin: 0;
+        font-family: "Lato", sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    #layoutSidenav_nav {
+        width: 250px;
+        position: fixed;
+        top: 70px;
+        left: 0;
+        height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+        background-color: #343a40;
+        color: #ffffff;
+        transition: all 0.3s;
+    }
+
+    .sb-sidenav-menu-heading {
+        color: #818181;
+        padding: 10px 0;
+    }
+
+    .nav-link {
+        padding: 10px 20px;
+        color: #ffffff;
+        text-decoration: none;
+        display: block;
+        transition: all 0.3s;
+    }
+
+        .nav-link:hover {
+            background-color: #818181;
+            color: white;
+        }
+
+    .sb-sidenav-footer {
+        padding: 20px;
+        text-align: center;
+        background-color: #343a40;
+    }
+
+        .sb-sidenav-footer b {
+            color: #ffffff;
+        }
+
+    /* Thêm CSS để xếp mục theo chiều dọc */
+    .sb-sidenav-menu {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Thêm CSS để mỗi mục nằm trên một dòng */
+    .nav {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
+
+
+<!-- Leftboard -->
+<div id="layoutSidenav_nav">
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <a class="nav-link" href="/">
+                    <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
+                    Home
+                </a>
+
+                <a class="nav-link" href="/Course">
+                    <div class="sb-nav-link-icon">
+                        <span class="media-left">
+                            <i class="icon fa fa-graduation-cap fa-fw " aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    Courses
+                </a>
+                
+               
+            </div>
+        </div>
+    </nav>
+</div>
+

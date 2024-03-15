@@ -1,0 +1,243 @@
+﻿@{
+    ViewData["Title"] = "Courses";
+}
+
+@{
+    Layout = null;
+}
+
+@using BusinessObject.Models
+@using X.PagedList.Mvc.Core
+@using X.PagedList
+@using X.PagedList.Mvc
+@model X.PagedList.IPagedList<BusinessObject.Models.Course>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Courses</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+
+
+    <style>
+        .content-wrapper {
+            margin-left: 250px; /* Điều chỉnh giá trị này tùy thuộc vào kích thước của leftboard */
+            margin-top: 80px;
+        }
+
+        li.nav-item a.active {
+            color: blue;
+            font-weight: bold;
+        }
+
+        li.nav-item a {
+            color: black;
+        }
+
+        .form-select option {
+            background-color: transparent;
+        }
+
+        .input-container {
+            position: relative;
+            display: inline-block;
+        }
+
+            .input-container input[type="text"] {
+                padding-right: 30px;
+            }
+
+        .clear-icon {
+            position: absolute;
+            top: 50%;
+            color: red;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            display: none;
+        }
+
+        .input-container:hover .clear-icon {
+            display: block;
+        }
+
+        .product-item {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgb(0 0 0);
+            text-align: center;
+        }
+
+        .product-thumb {
+            width: 180px;
+            height: 250px;
+        }
+
+        .product-name {
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body class="sb-nav-fixed">
+    @await Html.PartialAsync("~/Views/Shared/Header.cshtml")
+
+    <div id="layoutSidenav">
+        <div id="page-wrapper">
+            @{
+                var userJson = Context.Session.GetString("user");
+            }
+            @if (!string.IsNullOrEmpty(userJson))
+            {
+                @Html.Partial("~/Views/Shared/Leftboard.cshtml")
+
+                var user = Newtonsoft.Json.JsonConvert.DeserializeObject<User>(userJson);
+
+                <div id="layoutSidenav_content" class="content-wrapper">
+                    <div class="container-fluid px-4">
+                        <div class="row justify-content-between mt-3 mb-3">
+                            <div class="col-md-3">
+                                <select id="course-filter-select" class="form-select" onchange="handleSubmit()">
+                                    <option class="text-center" value="-1" selected=" @(ViewBag.FilterType == null || ViewBag.FilterType == -1 ? true: false)">
+                                        All
+                                    </option>
+                                    <option class="text-center" value="@user.UserId" selected="@(ViewBag.FilterType != null && ViewBag.FilterType == user.UserId ? true : false)">
+                                        My Courses
+                                    </option>
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="input-container">
+                                    <input id="myInput1" class="form-control" type="text" name="key" value="@ViewBag.Key"
+                                       placeholder="Search courses...">
+                                    <span class="clear-icon" onclick="clearInput()">X</span>
+                                </div>
+                                <button type="button" onclick="handleSubmit()" class="btn btn-primary">Search</button>
+                            </div>
+
+
+
+                            <div class="col-md-3">
+                                <select id="sort-select" class="form-select" onchange="handleSubmit()">
+                                    <option class="text-center" value="sortBy=name&sortValue=asc" selected="@(ViewBag.Sort == "sortBy=name&sortValue=asc" ? true:false)">
+                                        A -> Z
+                                    </option>
+                                    <option class="text-center" value="sortBy=name&sortValue=desc" selected="@(ViewBag.Sort == "sortBy=name&sortValue=desc" ? true:false)">
+                                        Z -> A
+                                    </option>
+                                </select>
+                            </div>
+
+                        </div>
+
+
+                        @{
+                            // Tạo một danh sách các màu ngẫu nhiên
+                            var randomColors = new List<string>();
+                            var rand = new Random();
+                            for (int i = 0; i < Model.Count; i++)
+                            {
+                                // Tạo màu ngẫu nhiên và thêm vào danh sách
+                                var color = string.Format("#{0:X6}", rand.Next(0x1000000));
+                                randomColors.Add(color);
+                            }
+                        }
+
+                        <div class="row mt-3 mb-3">
+                            @if (Model != null && Model.Any())
+                            {
+                                for (int i = 0; i < Model.Count; i++)
+                                {
+                                    var course = Model[i];
+                                    var color = randomColors[i]; // Lấy màu ngẫu nhiên tương ứng với khóa học
+
+                                    <div class="col-lg-2 col-md-3 col-sm-6 product-down">
+                                        <div class="row">
+                                            <div class="product-item" style="background-color: white;  border-radius: 10px;  box-shadow: 0 0 10px rgb(0 0 0);   text-align: center;">
+                                                <div class="product-top">
+                                                    <a href="/Course/Details?CourseId={@course.CourseId}" class="product-thumb">
+                                                        <div style="height: 100%; width: 100%; background-color:@color;" alt=""> </div>
+                                                    </a>
+
+
+                                                    @if (string.IsNullOrEmpty(userJson))
+                                                    {
+                                                        <a href="/Authenticate/Login" style="cursor: pointer;" class="buy-now">Enroll</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a style="cursor: pointer;" href="/Course/Register" class="buy-now">Enroll</a>
+                                                    }
+                                                </div>
+
+                                                <div class="product-infor">
+                                                    <div style="height: 100px">
+                                                        <a href="" class="product-name">@course.CourseName</a>
+                                                    </div>
+
+                                                    <div class="product-price">@course.CourseDescription</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col-4">
+                                <div class="pagination bg-light" style="margin-top:110px; width:200px">
+                                    @Html.PagedListPager(Model, page => Url.Action("Index",
+                                new{filterType =  ViewBag.FilterType, key=ViewBag.Key, sortBy = ViewBag.SortBy, sortValue = ViewBag.SortValue,  page }))
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+
+    <script>
+        // Function to handle change event of the select element
+        function handleSubmit() {
+            var url = "/Course";
+            var filterTypeValue = document.getElementById("course-filter-select").value;
+
+            if (filterTypeValue != -1) url += "?filterType=" + filterTypeValue;
+
+            var keyInput = document.getElementById("myInput1").value.trim();
+            if (keyInput != null && keyInput != "") {
+                if (url.includes("?")) {
+                    url += "&key=" + encodeURIComponent(keyInput);
+
+                } else {
+                    url += "?key=" + encodeURIComponent(keyInput);
+                }
+            }
+            var sort = document.getElementById("sort-select").value;
+
+            if (url.includes("?")) url += "&" + sort;
+            else url += "?" + sort;
+
+
+            window.location.href = url;
+        }
+
+
+    </script>
+
+    <script>
+        function clearInput() {
+            document.getElementById("myInput1").value = "";
+        }
+    </script>
+
+</body>
+</html>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BusinessObject.Models
 {
@@ -14,6 +15,7 @@ namespace BusinessObject.Models
         public string? CourseName { get; set; }
         public string? CourseDescription { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<CourseRegistration> CourseRegistrations { get; set; }
     }
 }

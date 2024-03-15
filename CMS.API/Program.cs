@@ -1,4 +1,5 @@
 ﻿using Infrastructures.Interfaces;
+using Infrastructures.Repositories;
 using Infrastructures.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
@@ -41,6 +42,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
 // DI Configuration
 builder.Services.AddScoped(typeof(ITokenService), typeof(TokenService));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+builder.Services.AddScoped(typeof(ICourseRepository), typeof(CourseRepository));
+builder.Services.AddScoped(typeof(IRegistrationRepository), typeof(RegistrationRepository));
+
+
 
 var app = builder.Build();
 

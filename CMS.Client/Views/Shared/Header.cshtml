@@ -9,23 +9,23 @@
 
 <nav class="sb-topnav navbar navbar-expand navbar-light bg-light fixed-top">
     <div class="container-fluid ">
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0 btn-spacing" id="sidebarToggle" href="#!">
+            <i class="fas fa-bars"></i>
+        </button>
         <nav class="navbar navbar-light bg-light">
             <a class="navbar-brand " href="/">
                 <img src="https://cmshn.fpt.edu.vn/pluginfile.php/1/core_admin/logocompact/0x70/1697438386/2020-FPTU-Eng.png"
                      width="100" height="30" class="d-inline-block align-top" alt="">
             </a>
-
         </nav>
-        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!">
-            <i class="fas fa-bars"></i>
-        </button>
+        
         <button class="navbar-toggler " type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse ms-5" id="navbarSupportedContent">
-            <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 1000px">
+            <ul class="navbar-nav mb-2 mb-lg-0 ms-auto">
 
                 @{
                     var userJson = Context.Session.GetString("user");
@@ -46,45 +46,45 @@
                         accessTokenExpiration = Convert.ToDateTime(accessTokenExpiration_raw.ToString());
                     }
                 }
+                <li class="nav-item ms-auto">
+                    @if (refreshToken is null || refreshTokenExpiration <= DateTime.UtcNow || string.IsNullOrEmpty(userJson))
+                    {
 
-                @if (refreshToken is null || refreshTokenExpiration <= DateTime.UtcNow || string.IsNullOrEmpty(userJson))
-                {
-                    <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Authenticate" asp-action="Login">
                             <i class="fa fa-unlock-alt" aria-hidden="true"></i> LOGIN
                         </a>
-                    </li>
-                }
-                else
-                {
-                    Console.WriteLine("rf not null and rf not expired");
-
-                    if (!string.IsNullOrEmpty(accessToken) && Convert.ToDateTime(accessTokenExpiration_raw) > DateTime.UtcNow)
-                    {
-                        dynamic user = Newtonsoft.Json.JsonConvert.DeserializeObject(userJson);
-                        <div class="btn-group">
-                            <button type="button" style="border-radius: 4px"
-                            class="btn btn-outline-dark dropdown-toggle py-2 px-4" data-toggle="dropdown"
-                            aria-expanded="false">
-                                <span class="font-weight-bold" style="font-size: 16px"> @user.fullName</span>
-                            </button>
-                            <ul class="dropdown-menu menuScroll">
-                                <li class="nav-item ">
-                                    <a href="/Accounts/Profile" class="text-black">
-                                        <i class="fa fa-user" aria-hidden="true"></i> Profile
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="Authenticate/Logout">Đăng xuất</a>
-                                </li>
-                            </ul>
-                        </div>
                     }
                     else
                     {
-                        Console.WriteLine("access null or expired access");
+                        Console.WriteLine("rf not null and rf not expired");
+
+                        if (!string.IsNullOrEmpty(accessToken) && Convert.ToDateTime(accessTokenExpiration_raw) > DateTime.UtcNow)
+                        {
+                            dynamic user = Newtonsoft.Json.JsonConvert.DeserializeObject(userJson);
+                            <div class="btn-group">
+                                <button type="button" style="border-radius: 4px"
+                                class="btn btn-outline-dark dropdown-toggle py-2 px-4" data-toggle="dropdown"
+                                aria-expanded="false">
+                                    <span class="font-weight-bold" style="font-size: 16px"> @user.fullName</span>
+                                </button>
+                                <ul class="dropdown-menu menuScroll">
+                                    <li class="nav-item ">
+                                        <a href="/Accounts/Profile" class="text-black">
+                                            <i class="fa fa-user" aria-hidden="true"></i> Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="Authenticate/Logout">Đăng xuất</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            Console.WriteLine("access null or expired access");
+                        }
                     }
-                }
+                </li>
             </ul>
         </div>
     </div>
@@ -145,7 +145,7 @@
 
     $(document).ready(function () {
         // Kiểm tra thời gian hết hạn của accessToken mỗi 5 phút
-        setInterval(checkAccessTokenExpiration, 5 * 60 * 1000); // Đơn vị tính là milliseconds
+        setInterval(checkAccessTokenExpiration, 5 * 1000); // Đơn vị tính là milliseconds
     });
 </script>
 

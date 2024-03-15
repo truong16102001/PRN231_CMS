@@ -37,8 +37,10 @@ body
     color: #fff;
 }
 #page-wrapper {
-    background-image: url(https://cmshn.fpt.edu.vn/theme/image.php/trema/theme/1697438386/frontpage/overlay), url(https://cmshn.fpt.edu.vn/pluginfile.php/1/theme_trema/frontpagebanner/1697438386/sanhAlpha.jpg);
+    background-image: url(https://cmshn.fpt.edu.vn/theme/image.php/trema/theme/1697438386/frontpage/overlay), 
+        url(https://cmshn.fpt.edu.vn/pluginfile.php/1/theme_trema/frontpagebanner/1697438386/sanhAlpha.jpg);
     width: 100% auto;
+    height:100% auto;
     background-size: 100% auto;
     background-attachment: fixed;
 }
@@ -84,32 +86,3 @@ footer
     color: #cdcece;
 }
 
-
-/*navbar > .container, .navbar > .container-fluid, .navbar > .container-lg, .navbar > .container-md, .navbar > .container-sm, .navbar > .container-xl, .navbar > .container-xxl {
-    display: flex;
-    flex-wrap: inherit;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.navbar > .container, .navbar > .container-fluid, .navbar > .container-lg, .navbar > .container-md, .navbar > .container-sm, .navbar > .container-xl, .navbar > .container-xxl {
-    display: flex;
-    flex-wrap: inherit;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.navbar > .container, .navbar > .container-fluid, .navbar > .container-lg, .navbar > .container-md, .navbar > .container-sm, .navbar > .container-xl, .navbar > .container-xxl {
-    display: flex;
-    flex-wrap: inherit;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
-    width: 100%;
-    padding-right: var(--bs-gutter-x, .75rem);
-    padding-left: var(--bs-gutter-x, .75rem);
-    margin-right: auto;
-    margin-left: auto;
-}*/
