@@ -7,6 +7,7 @@
 }
 
 @using BusinessObject.Models
+@using Newtonsoft.Json;
 @using X.PagedList.Mvc.Core
 @using X.PagedList
 @using X.PagedList.Mvc
@@ -89,6 +90,22 @@
     <div id="layoutSidenav">
         <div id="page-wrapper">
             @{
+                var noti = Context.Session.GetString("Notification");
+                if (noti != null)
+                {
+                    Dictionary<string, string> notificationData = JsonConvert.DeserializeObject<Dictionary<string, string>>(noti);
+                    string type = notificationData["Type"];
+                    string message = notificationData["Message"];
+
+                    <div class="alert @type alert-dismissible fade show" role="alert" style="position: fixed; bottom: 10px; right: 10px; z-index: 15;">
+                        <strong>@message</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    Context.Session.Remove("Notification");
+                }
+            }
+
+            @{
                 var userJson = Context.Session.GetString("user");
             }
             @if (!string.IsNullOrEmpty(userJson))
@@ -165,14 +182,13 @@
                                                         <div style="height: 100%; width: 100%; background-color:@color;" alt=""> </div>
                                                     </a>
 
-
                                                     @if (string.IsNullOrEmpty(userJson))
                                                     {
                                                         <a href="/Authenticate/Login" style="cursor: pointer;" class="buy-now">Enroll</a>
                                                     }
                                                     else
                                                     {
-                                                        <a style="cursor: pointer;" href="/Course/Register" class="buy-now">Enroll</a>
+                                                        <a style="cursor: pointer;" href="/Course/Register?CourseId=@course.CourseId" class="buy-now">Enroll</a>
                                                     }
                                                 </div>
 
@@ -239,5 +255,14 @@
         }
     </script>
 
+    <script>
+        if (document.querySelector('.alert')) {
+            document.querySelectorAll('.alert').forEach(function ($el) {
+                setTimeout(() => {
+                    $el.classList.remove('show');
+                }, 3000);
+            });
+        }
+    </script>
 </body>
 </html>

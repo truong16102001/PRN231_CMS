@@ -1,4 +1,5 @@
-﻿using BusinessObject.Models;
+﻿using BusinessObject.DTO;
+using BusinessObject.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using X.PagedList;
@@ -55,6 +56,66 @@ namespace CMS.Client.Controllers
             int pageSize = 4;
 
             return View(courses.ToPagedList((int)page, (int)pageSize));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RegisterAsync(int courseId)
+        {
+            // Kiểm tra xem người dùng đã đăng nhập hay chưa
+            var userJson = HttpContext.Session.GetString("user");
+            if (string.IsNullOrEmpty(userJson))
+            {
+                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
+                return RedirectToAction("Login", "Authenticate");
+            }
+
+            // Lấy thông tin người dùng từ session
+            var user = JsonConvert.DeserializeObject<User>(userJson);
+
+            Dictionary<string, string> notificationData = new Dictionary<string, string>();
+
+            if (!user.Role.Equals("teacher"))
+            {
+                notificationData["Type"] = "alert-warning"; // hoặc "danger" tùy vào loại alert
+                notificationData["Message"] = "You not have permission to register this course!";
+                // Chuyển đổi Dictionary thành một chuỗi JSON để lưu vào session
+                string notiJson = JsonConvert.SerializeObject(notificationData);
+
+                // Lưu chuỗi JSON vào session
+                HttpContext.Session.SetString("Notification", notiJson);
+                return RedirectToAction("Index");
+            }
+
+            var courseRegistration = new RegistrationAddUpdateDTO
+            {
+                CourseId = courseId,
+                UserId = user.UserId,
+                RegistedTime = DateTime.Now
+            };
+
+            using (HttpClient client = new HttpClient())
+            {
+                using (HttpResponseMessage responseMessage = await client.PostAsJsonAsync(DefaultCourseApiUrl + "/Register", courseRegistration))
+                {
+                    if (!responseMessage.IsSuccessStatusCode)
+                    {
+                        notificationData["Type"] = "alert-danger"; // hoặc "danger" tùy vào loại alert
+                        notificationData["Message"] = "Register failed. Please check again!";
+                    }
+                    else
+                    {
+                        notificationData["Type"] = "alert-success"; // hoặc "danger" tùy vào loại alert
+                        notificationData["Message"] = "Registered success!";
+                    }
+                }
+            }
+            // Chuyển đổi Dictionary thành một chuỗi JSON để lưu vào session
+            string notificationJson = JsonConvert.SerializeObject(notificationData);
+
+            // Lưu chuỗi JSON vào session
+            HttpContext.Session.SetString("Notification", notificationJson);
+
+            return RedirectToAction("Index");
         }
 
     }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BusinessObject.Models
+namespace BussinessObject1.Models
 {
-    public partial class FileUpload
+    public partial class Upload
     {
         public int UploadId { get; set; }
         public int? SectionId { get; set; }

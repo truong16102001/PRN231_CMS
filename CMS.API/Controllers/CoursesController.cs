@@ -1,4 +1,5 @@
-﻿using BusinessObject.Models;
+﻿using BusinessObject.DTO;
+using BusinessObject.Models;
 using Infrastructures.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -69,6 +70,27 @@ namespace CMS.API.Controllers
             {
                 // Trả về lỗi 500 nếu xảy ra lỗi
                 return StatusCode(500, "Error retrieving courses: " + ex.Message);
+            }
+        }
+
+        [HttpPost("Register")]
+        public async Task<ActionResult<CourseRegistration>> RegisterCourse([FromBody] RegistrationAddUpdateDTO courseRegistration)
+        {
+            try
+            {
+                if (courseRegistration == null)
+                {
+                    return BadRequest("Invalid courseRegistration data");
+                }
+                return StatusCode(200, await _registrationRepository.RegisterCourse(courseRegistration));
+            }
+            catch (ApplicationException ae)
+            {
+                return StatusCode(400, ae.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 

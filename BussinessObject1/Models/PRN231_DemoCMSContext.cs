@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 
-namespace BusinessObject.Models
+namespace BussinessObject1.Models
 {
     public partial class PRN231_DemoCMSContext : DbContext
     {

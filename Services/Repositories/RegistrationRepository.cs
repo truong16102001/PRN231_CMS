@@ -1,4 +1,5 @@
-﻿using BusinessObject.Models;
+﻿using BusinessObject.DTO;
+using BusinessObject.Models;
 using Infrastructures.DataAccess;
 using Infrastructures.Interfaces;
 using System;
@@ -14,6 +15,11 @@ namespace Infrastructures.Repositories
         public async Task<IEnumerable<CourseRegistration>> GetCourseRegistrations()
         {
             return await CourseRegistrationDAO.GetListOfRegistration();
+        }
+
+        public async Task<bool> RegisterCourse(RegistrationAddUpdateDTO courseRegistration)
+        {
+            return await CourseRegistrationDAO.RegisterCourse(courseRegistration);
         }
     }
 }

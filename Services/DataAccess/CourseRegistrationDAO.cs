@@ -1,4 +1,5 @@
-﻿using BusinessObject.Models;
+﻿using BusinessObject.DTO;
+using BusinessObject.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,25 @@ namespace Infrastructures.DataAccess
                 list = context.CourseRegistrations.ToList();
             }
             return list ?? new();
+        }
+
+        internal static async Task<bool> RegisterCourse(RegistrationAddUpdateDTO courseRegistration)
+        {
+            using (var context = new PRN231_DemoCMSContext())
+            {
+                CourseRegistration pub = new CourseRegistration
+                {
+                    RegistrationId = courseRegistration.RegistrationId,
+                    CourseId= courseRegistration.CourseId,
+                    UserId= courseRegistration.UserId,
+                    RegistedTime= courseRegistration.RegistedTime,
+                    EditedCourseName= courseRegistration.EditedCourseName,
+                    EditedCourseDescription= courseRegistration.EditedCourseDescription
+
+                };
+                await context.CourseRegistrations.AddAsync(pub);
+                return await context.SaveChangesAsync() > 0;
+            }
         }
     }
 }

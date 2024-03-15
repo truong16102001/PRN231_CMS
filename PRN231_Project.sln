@@ -5,11 +5,11 @@ VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessObject", "BusinessObject\BusinessObject.csproj", "{DE60FA40-CB66-473C-84F5-6F9204410643}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructures", "Services\Infrastructures.csproj", "{EC5B174F-0F27-4431-88B0-7089DE206D30}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructures", "Services\Infrastructures.csproj", "{EC5B174F-0F27-4431-88B0-7089DE206D30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMS.API", "CMS.API\CMS.API.csproj", "{15CB76DD-5F60-42F2-A6A6-7A4C2AE2038C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMS.API", "CMS.API\CMS.API.csproj", "{15CB76DD-5F60-42F2-A6A6-7A4C2AE2038C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMS.Client", "CMS.Client\CMS.Client.csproj", "{D2F8DDBB-31CA-4A68-AA9B-C4554F65F08D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMS.Client", "CMS.Client\CMS.Client.csproj", "{D2F8DDBB-31CA-4A68-AA9B-C4554F65F08D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
