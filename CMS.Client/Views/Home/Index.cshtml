@@ -1,4 +1,5 @@
-﻿@{
+﻿@using Newtonsoft.Json;
+@{
     ViewData["Title"] = "Home";
 }
 
@@ -35,6 +36,7 @@
     @Html.Partial("~/Views/Shared/Header.cshtml")
 
     <div id="layoutSidenav">
+        @Html.Partial("~/Views/Shared/Notifications.cshtml")
         @{
             var userJson = Context.Session.GetString("user");
         }

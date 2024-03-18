@@ -8,6 +8,7 @@ namespace BusinessObject.Models
         public User()
         {
             CourseRegistrations = new HashSet<CourseRegistration>();
+            Courses = new HashSet<Course>();
         }
 
         public int UserId { get; set; }
@@ -18,5 +19,6 @@ namespace BusinessObject.Models
 
         public virtual RefreshToken? RefreshToken { get; set; }
         public virtual ICollection<CourseRegistration> CourseRegistrations { get; set; }
+        public virtual ICollection<Course> Courses { get; set; }
     }
 }

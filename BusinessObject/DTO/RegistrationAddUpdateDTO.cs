@@ -8,7 +8,7 @@ namespace BusinessObject.DTO
 {
     public class RegistrationAddUpdateDTO
     {
-        public int RegistrationId { get; set; }
+        public int? RegistrationId { get; set; }
         public int? CourseId { get; set; }
         public int? UserId { get; set; }
         public DateTime? RegistedTime { get; set; }

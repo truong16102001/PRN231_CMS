@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Configuration;
 
 namespace BusinessObject.Models
 {
@@ -29,8 +28,8 @@ namespace BusinessObject.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var ConnectionString = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetConnectionString("PRN231DB");
-                optionsBuilder.UseSqlServer(ConnectionString);
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("server =(local); database = PRN231_DemoCMS;uid=ndt;pwd=16102001;TrustServerCertificate=true");
             }
         }
 
@@ -41,6 +40,11 @@ namespace BusinessObject.Models
                 entity.Property(e => e.CourseName).HasMaxLength(100);
 
                 entity.Property(e => e.Image).IsUnicode(false);
+
+                entity.HasOne(d => d.Creator)
+                    .WithMany(p => p.Courses)
+                    .HasForeignKey(d => d.CreatorId)
+                    .HasConstraintName("FK_Courses_Users");
             });
 
             modelBuilder.Entity<CourseRegistration>(entity =>

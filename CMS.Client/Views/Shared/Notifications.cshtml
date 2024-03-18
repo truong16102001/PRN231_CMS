@@ -1,0 +1,28 @@
+﻿
+
+@using Newtonsoft.Json;
+@{
+    var noti = Context.Session.GetString("Notification");
+    if (noti != null)
+    {
+        Dictionary<string, string> notificationData = JsonConvert.DeserializeObject<Dictionary<string, string>>(noti);
+        string type = notificationData["Type"];
+        string message = notificationData["Message"];
+
+        <div class="alert @type alert-dismissible fade show" role="alert" style="position: fixed; bottom: 10px; right: 10px; z-index: 15;">
+            <strong>@message</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        Context.Session.Remove("Notification");
+    }
+}
+
+<script>
+    if (document.querySelector('.alert')) {
+        document.querySelectorAll('.alert').forEach(function ($el) {
+            setTimeout(() => {
+                $el.classList.remove('show');
+            }, 3000);
+        });
+    }
+</script>

@@ -11,6 +11,11 @@ namespace Infrastructures.Repositories
 {
     public class CourseRepository : ICourseRepository
     {
+        public async Task<Course> GetCourseById(int courseId)
+        {
+            return await CourseDAO.GetById(courseId);
+        }
+
         public async Task<IEnumerable<Course>> GetCourses()
         {
             return await CourseDAO.GetListOfCourse();

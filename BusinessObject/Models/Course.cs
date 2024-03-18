@@ -14,7 +14,9 @@ namespace BusinessObject.Models
         public string? CourseName { get; set; }
         public string? CourseDescription { get; set; }
         public string? Image { get; set; }
+        public int? CreatorId { get; set; }
 
+        public virtual User? Creator { get; set; }
         public virtual ICollection<CourseRegistration> CourseRegistrations { get; set; }
     }
 }

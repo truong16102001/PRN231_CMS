@@ -16,14 +16,12 @@ namespace CMS.Client.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly HttpClient client = null;
-        private string BaseUrl = "";
         private readonly CommonFunctions _commonFunctions;
         public AuthenticateController(IConfiguration configuration, CommonFunctions commonFunctions)
         {
             client = new HttpClient();
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
-            BaseUrl = "https://localhost:7149";
             _configuration = configuration;
             _commonFunctions = commonFunctions;
         }
@@ -63,12 +61,27 @@ namespace CMS.Client.Controllers
                 SetCookies("refreshToken", refreshToken, DateTime.MaxValue);
                 SetCookies("refreshTokenExpires", expirationRefreshToken, DateTime.MaxValue);
 
-                return RedirectToAction("Index", "Home");
+                var historyUrl = HttpContext.Session.GetString("historyUrl");
+                if(!string.IsNullOrEmpty(historyUrl))
+                {
+                    return Redirect(historyUrl);
+                }
+                historyUrl = "/";
+                return Redirect(historyUrl);
 
             }
             else
             {
-                return RedirectToAction("Index", "Home", new { @alertMessage = "Login fail!" });
+                Dictionary<string, string> notificationData = new Dictionary<string, string>();
+                notificationData["Type"] = "alert-danger"; // hoặc "danger" tùy vào loại alert
+                notificationData["Message"] = "Login failed! Invalid email or password";
+                // Chuyển đổi Dictionary thành một chuỗi JSON để lưu vào session
+                string notificationJson = JsonConvert.SerializeObject(notificationData);
+
+                // Lưu chuỗi JSON vào session
+                HttpContext.Session.SetString("Notification", notificationJson);
+
+                return Redirect("/Authenticate/Login");
             }
         }
 

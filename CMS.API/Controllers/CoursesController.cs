@@ -73,6 +73,28 @@ namespace CMS.API.Controllers
             }
         }
 
+        // GET: api/Courses/{CourseId}
+        [HttpGet("{CourseId}")]
+        public async Task<ActionResult<Course>> GetCourseById(int CourseId)
+        {
+            try
+            {
+                var course = await _courseRepository.GetCourseById(CourseId);
+
+                if (course == null)
+                {
+                    return NotFound(); 
+                }
+
+                return Ok(course); 
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error retrieving course: " + ex.Message);
+            }
+        }
+
+
         [HttpPost("Register")]
         public async Task<ActionResult<CourseRegistration>> RegisterCourse([FromBody] RegistrationAddUpdateDTO courseRegistration)
         {

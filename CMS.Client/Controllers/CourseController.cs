@@ -18,6 +18,21 @@ namespace CMS.Client.Controllers
         public async Task<IActionResult> Index(int? filterType, string? key,
             string sortBy = "name", string sortValue = "asc", int page = 1)
         {
+
+            var userJson = HttpContext.Session.GetString("user");
+            if (string.IsNullOrEmpty(userJson))
+            {
+                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
+                return RedirectToAction("Login", "Authenticate");
+            }
+
+            var historyUrl = "/Course";
+            if(!string.IsNullOrEmpty(filterType+"") && filterType != -1)
+            {
+                historyUrl += "?filterType=" + filterType;
+            }
+            
+
             string apiUrl = DefaultCourseApiUrl;
 
             apiUrl += $"?filterType={filterType ?? -1}";
@@ -29,6 +44,8 @@ namespace CMS.Client.Controllers
                 ViewBag.Key = key;
                 apiUrl += apiUrl.Contains("?") ? "&" : "?";
                 apiUrl += $"key={key}";
+                historyUrl += historyUrl.Contains("?") ? "&" : "?";
+                historyUrl += $"key={key}";
             }
 
             sortBy = sortBy.Trim();
@@ -38,7 +55,8 @@ namespace CMS.Client.Controllers
             apiUrl += apiUrl.Contains("?") ? "&" : "?";
             apiUrl += $"sortBy=" + sortBy + "&sortValue=" + sortValue;
             ViewBag.Sort = $"sortBy=" + sortBy + "&sortValue=" + sortValue;
-
+            historyUrl += historyUrl.Contains("?") ? "&" : "?";
+            historyUrl += $"sortBy=" + sortBy + "&sortValue=" + sortValue;
 
             var courses = new List<Course>();
             using (HttpClient client = new HttpClient())
@@ -53,13 +71,16 @@ namespace CMS.Client.Controllers
                 }
             }
 
-            int pageSize = 4;
+            int pageSize = 6;
+            HttpContext.Session.SetString("historyUrl", historyUrl);
 
             return View(courses.ToPagedList((int)page, (int)pageSize));
         }
 
-        [HttpGet]
-        public async Task<IActionResult> RegisterAsync(int courseId)
+
+
+        [HttpPost]
+        public async Task<IActionResult> RegisterAsync(RegistrationAddUpdateDTO courseRegistrationDTO)
         {
             // Kiểm tra xem người dùng đã đăng nhập hay chưa
             var userJson = HttpContext.Session.GetString("user");
@@ -88,9 +109,11 @@ namespace CMS.Client.Controllers
 
             var courseRegistration = new RegistrationAddUpdateDTO
             {
-                CourseId = courseId,
+                CourseId = courseRegistrationDTO.CourseId,
                 UserId = user.UserId,
-                RegistedTime = DateTime.Now
+                RegistedTime = DateTime.Now,
+                EditedCourseName = courseRegistrationDTO.EditedCourseName??"",
+                EditedCourseDescription= courseRegistrationDTO.EditedCourseDescription??""
             };
 
             using (HttpClient client = new HttpClient())
@@ -115,7 +138,15 @@ namespace CMS.Client.Controllers
             // Lưu chuỗi JSON vào session
             HttpContext.Session.SetString("Notification", notificationJson);
 
-            return RedirectToAction("Index");
+            var historyUrl = HttpContext.Session.GetString("historyUrl");
+            if (!string.IsNullOrEmpty(historyUrl))
+            {
+                return Redirect(historyUrl);
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
         }
 
     }
