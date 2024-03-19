@@ -1,5 +1,6 @@
 ﻿using BusinessObject.Models;
 using Infrastructures.DataAccess;
+using Infrastructures.Helpers;
 using Infrastructures.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -25,15 +26,17 @@ namespace Infrastructures.Services
             _configuration = configuration;
         }
 
+        
         public JwtSecurityToken GenerateAccessToken(IEnumerable<Claim> authClaims)
         {
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
             _ = int.TryParse(_configuration["JWT:TokenValidityInMinutes"], out int tokenValidityInMinutes);
 
+           
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:Issuer"],
                 audience: _configuration["JWT:Audience"],
-                expires: DateTime.UtcNow.AddMinutes(tokenValidityInMinutes),
+                expires: TimeHelper.GetCurrentTimeInCountry("vietnam").AddMinutes(tokenValidityInMinutes),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );

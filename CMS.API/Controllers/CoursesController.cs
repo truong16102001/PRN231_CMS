@@ -83,10 +83,10 @@ namespace CMS.API.Controllers
 
                 if (course == null)
                 {
-                    return NotFound(); 
+                    return NotFound();
                 }
 
-                return Ok(course); 
+                return Ok(course);
             }
             catch (Exception ex)
             {
@@ -113,6 +113,43 @@ namespace CMS.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
+            }
+        }
+
+        // POST: api/Courses/CreateCourse
+        [HttpPost("CreateCourse")]
+        public async Task<ActionResult<Course>> CreateCourse([FromBody] CourseAddUpdateDTO courseData)
+        {
+            try
+            {
+                if (courseData == null)
+                {
+                    return BadRequest("Invalid course data");
+                }
+
+                // Validate necessary fields
+                if (string.IsNullOrEmpty(courseData.CourseName))
+                {
+                    return BadRequest("Course name cannot be empty");
+                }
+
+                // Create a new Course object
+                var newCourse = new Course
+                {
+                    CourseName = courseData.CourseName,
+                    CourseDescription = courseData.CourseDescription,
+                    Image = courseData.Image,
+                    CreatorId = courseData.CreatorId
+                };
+
+                var status = await _courseRepository.AddCourse(newCourse);
+
+                return Ok(status);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error creating course: " + ex.Message);
             }
         }
 

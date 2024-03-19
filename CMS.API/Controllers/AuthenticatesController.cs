@@ -1,5 +1,6 @@
 ﻿using BusinessObject.DTO;
 using BusinessObject.Models;
+using Infrastructures.Helpers;
 using Infrastructures.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -65,14 +66,16 @@ namespace CMS.API.Controllers
 
             var accesstoken = _tokenService.GenerateAccessToken(authClaims);
 
-            DateTime expiresAccessToken = accesstoken.ValidTo;
+            DateTime expiresAccessToken_raw = ((JwtSecurityToken)accesstoken).ValidTo;
+
+            DateTime expiresAccessToken =  TimeHelper.ConvertToCountryTime(expiresAccessToken_raw, "vietnam");
 
 
             //Handle when refreshtoken existed
             var existedToken = await _tokenService.GetRefreshTokenByUserId(user.UserId);
 
             string newRefreshToken = "";
-            DateTime expiredTime = DateTime.UtcNow;
+            DateTime expiredTime = DateTime.Now;
 
             if (existedToken == null || string.IsNullOrEmpty(existedToken.Token) || existedToken.ExpirationTime <= DateTime.Now)
             {
@@ -110,33 +113,34 @@ namespace CMS.API.Controllers
 		///  created at: 2024/26/2
 		[HttpPost]
         [Route("refreshToken")]
-        public async Task<IActionResult> RefreshToken(UserInfoTokenDTO userLoginInfo)
+        public async Task<IActionResult> RefreshToken(UserInfoTokenDTO userInfoTokenDTO)
         {
-            if (userLoginInfo is null)
+            if (userInfoTokenDTO is null)
             {
                 return BadRequest("Invalid client request");
             }
 
-            string? accessToken = userLoginInfo.AccessToken;
-            string? refreshToken = userLoginInfo.RefreshToken;
-
-            var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken ?? userInfo.AccessToken);
+            var principal = _tokenService.GetPrincipalFromExpiredToken(userInfo!.AccessToken);
 
             string userId = principal.FindFirst("UserId").Value;
 
 
             var existedToken = await _tokenService.GetRefreshTokenByUserId(int.Parse(userId));
             // invalid user || invalid refresh token
-            if (existedToken == null || existedToken.Token != refreshToken)
+            if (existedToken == null || existedToken.Token != userInfoTokenDTO.RefreshToken)
             {
+                Console.WriteLine("w");
                 return BadRequest("Refresh Token is not existed in db or token is expired");
             }
 
             var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims.ToList());
+            DateTime expiresAccessToken = TimeHelper.ConvertToCountryTime(newAccessToken.ValidTo, "vietnam");
+
             string newRefreshToken = existedToken.Token;
+
             DateTime expiredTime = (DateTime)existedToken.ExpirationTime;
 
-            if (expiredTime <= DateTime.UtcNow)
+            if (expiredTime <= DateTime.Now)
             {
                 newRefreshToken = _tokenService.GenerateRefreshToken();
                 expiredTime = DateTime.Now.AddMinutes(int.Parse(_configuration["JWT:RefreshTokenValidityInMinutes"]));
@@ -145,7 +149,7 @@ namespace CMS.API.Controllers
             userInfo.RefreshToken = newRefreshToken;
             userInfo.AccessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken);
             userInfo.RefreshTokenExpires = expiredTime;
-            userInfo.AccessTokenExpires = newAccessToken.ValidTo;
+            userInfo.AccessTokenExpires = expiresAccessToken;
 
             return StatusCode(200, new ApiResponse
             {
@@ -155,5 +159,7 @@ namespace CMS.API.Controllers
                 Message = "Refresh token success"
             });
         }
+
+       
     }
 }

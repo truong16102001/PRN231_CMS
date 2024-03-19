@@ -122,7 +122,7 @@
 
                             <div class="col-md-3 d-flex align-items-end">
                                 <!-- Thêm class "d-flex align-items-end" để căn chỉnh nút "Add" cùng hàng với select -->
-                                <button type="button" onclick="" class="btn btn-primary mr-2">+Add</button>
+                                <button type="button" id="btnAdd" class="btn btn-primary mr-2">+Add</button>
                                 <select id="course-filter-select" class="form-select " onchange="handleFilter()">
                                     <option class="text-center" value="-1" selected="@(ViewBag.FilterType == null || ViewBag.FilterType == -1 ? true: false)">
                                         All
@@ -160,7 +160,6 @@
                         <div class="row mt-3 mb-3">
                             @if (Model != null && Model.Any())
                             {
-
                                 for (int i = 0; i < Model.Count; i++)
                                 {
                                     var course = Model[i];
@@ -234,6 +233,43 @@
         </div>
     </div>
 
+    @*add modal*@
+    <div class="modal" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="editModel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Create new Course</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="txtCourseName" class="col-form-label">Course Name</label>
+                                <input type="text" id="txtCourseName" class="form-control" placeholder="Name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="txtCourseDescription" class="col-form-label">Course Description</label>
+                                <input type="text" id="txtCourseDescription" class="form-control" placeholder="Description">
+                            </div>
+                            <div class="mb-3">
+                                <label for="color-select" class="col-form-label">Color</label>
+                                <select id="color-select" class="form-control">
+                                    <!-- Dữ liệu Categories sẽ được hiển thị ở đây -->
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnInsert">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Function to handle change event of the select element
@@ -263,7 +299,6 @@
     </script>
 
     <script>
-
         function clearInput() {
             document.getElementById("myInput1").value = "";
         }
@@ -299,6 +334,86 @@
 
         function handleSubmit() {
             document.getElementById("enrollForm").submit();
+        }
+    </script>
+
+    <script>
+        //load add modal
+        $("#btnAdd").click(function () {
+            $("#modalAdd").modal("show");
+            // Gọi API để lấy danh sách Categories và điền vào dropdown
+            loadColors("#color-select", "F0F8FF");
+        });
+
+        function htmlDecode(input) {
+            var doc = new DOMParser().parseFromString(input, "text/html");
+            return doc.documentElement.textContent;
+        }
+
+        //add
+        $("#btnInsert").click(function () {
+            var userJson = "@userJson";
+            if (userJson !== "") {
+                var decodedUserJson = htmlDecode(userJson);
+                var user = JSON.parse(decodedUserJson);
+                var userId = user.UserId;
+
+                var course = {
+                    "CourseId": 0,
+                    "CourseName": $("#txtCourseName").val(),
+                    "CourseDescription": $("#txtCourseDescription").val(),
+                    "Image": "#"+$("#color-select").val(),
+                    "CreatorId": userId
+                }
+                $.ajax({
+                    type: "POST",
+                    url: 'https://localhost:7149/api/Courses/CreateCourse',
+                    data: JSON.stringify(course),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    cache: false,
+                    success: function (data) {
+                        $("#modalAdd").modal("hide");
+                        window.location.href = "/Course";
+                    },
+                });
+            } else {
+                window.location.href = "/Authenticate/Login";
+            }
+        });
+
+        //Function load categories
+        function loadColors(selector, selectedHex) {
+            $.ajax({
+                url: 'https://localhost:7149/api/Colors',
+                type: 'GET',
+                dataType: 'json',
+                success: function (colors) {
+                    var colorSelect = $(selector);
+                    colorSelect.empty();
+
+                    // Display colors in a dropdown menu with background color directly set on option elements
+                    $.each(colors, function (index, color) {
+                        // Tạo một option mới
+                        var option = $('<option>', {
+                            value: color.hex, // Giá trị của option là mã hex của màu
+                            text: color.name, // Text của option là tên của màu
+                            style: 'background-color: #' + color.hex + ';' // Đặt background-color cho option
+                        });
+
+                        // Kiểm tra nếu màu này được chọn
+                        if (color.hex === selectedHex) {
+                            option.attr('selected', 'selected');
+                        }
+
+                        // Thêm option vào dropdown
+                        colorSelect.append(option);
+                    });
+                },
+                error: function (error) {
+                    console.error('Error loading categories:', error);
+                }
+            });
         }
     </script>
 

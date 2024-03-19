@@ -34,8 +34,9 @@ namespace CMS.Client.Commons
             var Response = await client.PostAsync(targerAddress, new StringContent(content, Encoding.UTF8, "application/json"));
             return Response;
         }
+       
 
-       
-       
+
+
     }
 }

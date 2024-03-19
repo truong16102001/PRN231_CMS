@@ -6,6 +6,10 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
 
+@{
+    var cookies = Context.Request.Cookies;
+
+}
 
 <nav class="sb-topnav navbar navbar-expand navbar-light bg-light fixed-top">
     <div class="container-fluid ">
@@ -18,7 +22,7 @@
                      width="100" height="30" class="d-inline-block align-top" alt="">
             </a>
         </nav>
-        
+
         <button class="navbar-toggler " type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -31,7 +35,7 @@
                     var userJson = Context.Session.GetString("user");
 
                     var refreshTokenExpiration_raw = Context.Request.Cookies["refreshTokenExpires"];
-                    var refreshTokenExpiration = DateTime.UtcNow;
+                    var refreshTokenExpiration = DateTime.Now;
                     if (!string.IsNullOrEmpty(refreshTokenExpiration_raw))
                     {
                         refreshTokenExpiration = Convert.ToDateTime(refreshTokenExpiration_raw.ToString());
@@ -39,26 +43,18 @@
 
                     var refreshToken = Context.Request.Cookies["refreshToken"];
                     var accessToken = Context.Request.Cookies["accessToken"];
-                    var accessTokenExpiration_raw = Context.Request.Cookies["accessTokenExpires"];
-                    var accessTokenExpiration = DateTime.UtcNow;
-                    if (!string.IsNullOrEmpty(accessTokenExpiration_raw))
-                    {
-                        accessTokenExpiration = Convert.ToDateTime(accessTokenExpiration_raw.ToString());
-                    }
+
                 }
                 <li class="nav-item ms-auto">
-                    @if (refreshToken is null || refreshTokenExpiration <= DateTime.UtcNow || string.IsNullOrEmpty(userJson))
+                    @if (refreshToken is null || refreshTokenExpiration <= DateTime.Now || string.IsNullOrEmpty(userJson))
                     {
-
                         <a class="nav-link text-dark" asp-area="" asp-controller="Authenticate" asp-action="Login">
                             <i class="fa fa-unlock-alt" aria-hidden="true"></i> LOGIN
                         </a>
                     }
                     else
                     {
-                        Console.WriteLine("rf not null and rf not expired");
-
-                        if (!string.IsNullOrEmpty(accessToken) && Convert.ToDateTime(accessTokenExpiration_raw) > DateTime.UtcNow)
+                        if (!string.IsNullOrEmpty(accessToken))
                         {
                             dynamic user = Newtonsoft.Json.JsonConvert.DeserializeObject(userJson);
                             <div class="btn-group">
@@ -91,30 +87,60 @@
 </nav>
 
 <script>
+
+
+    function getCookieValueByName(name) {
+        var cookies = {
+    @foreach (var cookie in Context.Request.Cookies)
+    {
+        <text>"@cookie.Key": "@cookie.Value", </text>
+    }
+                                                };
+
+    // Kiểm tra xem cookie có tồn tại không
+    if (cookies[name]) {
+        // Trích xuất giá trị từ chuỗi JSON (loại bỏ các ký tự đặc biệt như `&#x2B;`)
+        var value = cookies[name].replace(/&#x2B;/g, '+');
+        return value; // Trả về giá trị của cookie
+    } else {
+        return null; // Trả về null nếu không tìm thấy cookie
+    }
+                                            }
+
+
+
     // Hàm để kiểm tra thời gian hết hạn của accessToken
-    function checkAccessTokenExpiration() {
-        // Hàm để lấy giá trị từ cookie
-        function getCookie(name) {
-            var value = "; " + document.cookie;
-            var parts = value.split("; " + name + "=");
-            if (parts.length == 2) return parts.pop().split(";").shift();
+    function checkTokenExpiration() {
+
+        var refreshTokenExpires = getCookieValueByName('refreshTokenExpires');
+        var currentTime = new Date().toUTCString();
+
+        var expirationDate = new Date(refreshTokenExpires);
+
+        // So sánh thời gian hiện tại với thời gian hết hạn của refreshToken
+        var currentTime = new Date();
+
+        if (expirationDate <= currentTime) {
+            // Nếu refreshToken đã hết hạn, chuyển hướng đến trang đăng nhập
+            window.location.href = "/Authenticate/Login";
+
+        } else {
+            var accessToken = getCookieValueByName('accessToken');
+
+            if (accessToken === null || accessToken === "") {
+                refreshToken();
+                window.location.reload();
+            } else {
+                console.log("kaka")
+            }
         }
 
-        var accessTokenExpiration = getCookie('accessTokenExpires');
-
-        accessTokenExpiration = new Date(accessTokenExpiration);
-
-        // Kiểm tra nếu accessToken đã hết hạn
-        if (accessTokenExpiration <= new Date()) {
-            // Gọi hàm refreshToken để cập nhật accessToken
-            refreshToken();
-        }
     }
 
     // Hàm gọi API refreshToken
     function refreshToken() {
         // Lưu ý: Cần thay đổi URL và dữ liệu gửi đi cho phù hợp với API của bạn
-        var refreshToken = getCookie('refreshToken');
+        var refreshToken = getCookieValueByName('refreshToken');
         $.ajax({
             url: "https://localhost:7149/api/Authenticates/refreshToken",
             type: "POST",
@@ -122,31 +148,26 @@
             contentType: "application/json",
             data: JSON.stringify({ refreshToken: refreshToken }), // Dữ liệu gửi đi là refreshToken
             success: function (response) {
-                var newAccessToken = response.accessToken;
-                var newAccessTokenExpiration = response.accessTokenExpires;
-
+                var newAccessToken = response.data.accessToken;
+                var newAccessTokenExpires = response.data.accessTokenExpires;
+                var expiresDate = new Date(newAccessTokenExpires);
+                var expiresString = expiresDate.toUTCString();
                 // Cập nhật lại accessToken và thời gian hết hạn của accessToken lên cookie
-                document.cookie = "accessToken=" + newAccessToken + "; path=/";
-                document.cookie = "accessTokenExpires=" + newAccessTokenExpiration + "; path=/";
-
-                window.location.reload();
+                document.cookie = "accessToken=" + newAccessToken + "; expires=" + expiresString + "; path=/";
             },
             error: function (xhr, status, error) {
                 console.error("Error refreshing token:", error);
-                redirectToHome(); // Chuyển hướng người dùng về trang chủ nếu refreshToken không thành công
             }
         });
     }
 
-    // Hàm chuyển hướng người dùng về trang chủ
-    function redirectToHome() {
-        window.location.href = '/Authenticate/Login'; // Đường dẫn trang chủ của ứng dụng
-    }
+
 
     $(document).ready(function () {
-        // Kiểm tra thời gian hết hạn của accessToken mỗi 5 phút
-        setInterval(checkAccessTokenExpiration, 5 * 1000); // Đơn vị tính là milliseconds
+        // Kiểm tra thời gian hết hạn của accessToken mỗi 5s
+        setInterval(checkTokenExpiration, 5 * 60 * 1000); // Đơn vị tính là milliseconds
     });
+
 </script>
 
 

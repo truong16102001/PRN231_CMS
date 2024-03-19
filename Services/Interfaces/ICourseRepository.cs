@@ -9,6 +9,7 @@ namespace Infrastructures.Interfaces
 {
     public interface ICourseRepository
     {
+        Task<bool> AddCourse(Course newCourse);
         Task<Course> GetCourseById(int courseId);
         Task<IEnumerable<Course>> GetCourses();
 

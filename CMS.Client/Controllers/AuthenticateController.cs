@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -38,63 +39,67 @@ namespace CMS.Client.Controllers
             LoginModel us = new LoginModel();
             us.Email = email;
             us.Password = password;
-            var response = _commonFunctions.PostData("api/Authenticates/login", JsonConvert.SerializeObject(us));
+            // var response = _commonFunctions.PostData("https://localhost:7149/api/Authenticates/login", JsonConvert.SerializeObject(us));
 
-            if (response.Result.IsSuccessStatusCode)
+            using (HttpClient client = new HttpClient())
             {
-                var responseData = await response.Result.Content.ReadAsStringAsync();
-                var jsonResponse = JsonConvert.DeserializeObject<ApiResponse>(responseData);
-
-
-                var data = JObject.Parse(jsonResponse.Data.ToString());
-                var accessToken = data["accessToken"].ToString();
-                var refreshToken = data["refreshToken"].ToString();
-                var expirationAccessToken = data["accessTokenExpires"].ToString();
-                var expirationRefreshToken = data["refreshTokenExpires"].ToString();
-
-                // Lưu thông tin người dùng vào session
-                HttpContext.Session.SetString("user", JsonConvert.SerializeObject(data["user"]));
-
-                SetCookies("accessToken", accessToken, DateTime.MaxValue);
-                SetCookies("accessTokenExpires", expirationAccessToken, DateTime.MaxValue);
-
-                SetCookies("refreshToken", refreshToken, DateTime.MaxValue);
-                SetCookies("refreshTokenExpires", expirationRefreshToken, DateTime.MaxValue);
-
-                var historyUrl = HttpContext.Session.GetString("historyUrl");
-                if(!string.IsNullOrEmpty(historyUrl))
+                using (HttpResponseMessage responseMessage = await client.PostAsJsonAsync("https://localhost:7149/api/Authenticates/login", us))
                 {
-                    return Redirect(historyUrl);
+                    if (responseMessage.IsSuccessStatusCode)
+                    {
+                        var responseData = await responseMessage.Content.ReadAsStringAsync();
+                        var jsonResponse = JsonConvert.DeserializeObject<ApiResponse>(responseData);
+
+
+                        var data = JObject.Parse(jsonResponse.Data.ToString());
+                        var accessToken = data["accessToken"].ToString();
+                        var refreshToken = data["refreshToken"].ToString();
+                        var expirationAccessToken = data["accessTokenExpires"].ToString();
+                        var expirationRefreshToken = data["refreshTokenExpires"].ToString();
+
+                        // Lưu thông tin người dùng vào session
+                        HttpContext.Session.SetString("user", JsonConvert.SerializeObject(data["user"]));
+
+                        SetCookies("accessToken", accessToken, Convert.ToDateTime(expirationAccessToken));
+                        SetCookies("refreshToken", refreshToken, DateTime.MaxValue);
+                        SetCookies("refreshTokenExpires", expirationRefreshToken, DateTime.MaxValue);
+
+                        var historyUrl = HttpContext.Session.GetString("historyUrl");
+                        if (!string.IsNullOrEmpty(historyUrl))
+                        {
+                            return Redirect(historyUrl);
+                        }
+                        historyUrl = "/";
+                        return Redirect(historyUrl);
+                    }
+                    else
+                    {
+                        Dictionary<string, string> notificationData = new Dictionary<string, string>();
+                        notificationData["Type"] = "alert-danger"; // hoặc "danger" tùy vào loại alert
+                        notificationData["Message"] = "Login failed! Invalid email or password";
+                        // Chuyển đổi Dictionary thành một chuỗi JSON để lưu vào session
+                        string notificationJson = JsonConvert.SerializeObject(notificationData);
+
+                        // Lưu chuỗi JSON vào session
+                        HttpContext.Session.SetString("Notification", notificationJson);
+
+                        return Redirect("/Authenticate/Login");
+                    }
                 }
-                historyUrl = "/";
-                return Redirect(historyUrl);
-
-            }
-            else
-            {
-                Dictionary<string, string> notificationData = new Dictionary<string, string>();
-                notificationData["Type"] = "alert-danger"; // hoặc "danger" tùy vào loại alert
-                notificationData["Message"] = "Login failed! Invalid email or password";
-                // Chuyển đổi Dictionary thành một chuỗi JSON để lưu vào session
-                string notificationJson = JsonConvert.SerializeObject(notificationData);
-
-                // Lưu chuỗi JSON vào session
-                HttpContext.Session.SetString("Notification", notificationJson);
-
-                return Redirect("/Authenticate/Login");
             }
         }
 
         public void SetCookies(string variable, string value, DateTime expires)
         {
+
             Response.Cookies.Append(variable, value,
                 new CookieOptions
                 {
                     Expires = expires,
                     HttpOnly = true,
-                    SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None,
-                    Secure = true // Ensure cookie is sent only over HTTPS
+                    SameSite = SameSiteMode.Strict
                 });
+
         }
 
 
@@ -102,7 +107,6 @@ namespace CMS.Client.Controllers
         public IActionResult Logout()
         {
             Response.Cookies.Delete("accessToken");
-            Response.Cookies.Delete("accessTokenExpires");
             Response.Cookies.Delete("refreshTokenExpires");
             Response.Cookies.Delete("refreshToken");
             HttpContext.Session.Remove("user");
