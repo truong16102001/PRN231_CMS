@@ -14,5 +14,7 @@ namespace BusinessObject.DTO
         public string? Image { get; set; }
         public int? CreatorId { get; set; }
 
+        public DateTime? CreatedTime { get; set; }
+
     }
 }

@@ -39,6 +39,8 @@ namespace BusinessObject.Models
             {
                 entity.Property(e => e.CourseName).HasMaxLength(100);
 
+                entity.Property(e => e.CreatedTime).HasColumnType("date");
+
                 entity.Property(e => e.Image).IsUnicode(false);
 
                 entity.HasOne(d => d.Creator)

@@ -139,7 +139,8 @@ namespace CMS.API.Controllers
                     CourseName = courseData.CourseName,
                     CourseDescription = courseData.CourseDescription,
                     Image = courseData.Image,
-                    CreatorId = courseData.CreatorId
+                    CreatorId = courseData.CreatorId,
+                    CreatedTime = DateTime.UtcNow.AddDays(1)
                 };
 
                 var status = await _courseRepository.AddCourse(newCourse);

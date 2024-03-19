@@ -49,7 +49,7 @@ namespace Infrastructures.DataAccess
             var courses = new List<Course>();
             using (var context = new PRN231_DemoCMSContext())
             {
-                courses = context.Courses.ToList();
+                courses = context.Courses.Include(c => c.Creator).ToList();
             }
             return courses;
         }

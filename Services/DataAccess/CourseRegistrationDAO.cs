@@ -1,5 +1,6 @@
 ﻿using BusinessObject.DTO;
 using BusinessObject.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +11,18 @@ namespace Infrastructures.DataAccess
 {
     internal class CourseRegistrationDAO
     {
-        internal static async Task<IEnumerable<CourseRegistration>> GetListOfRegistration()
+        public static async Task<IEnumerable<CourseRegistration>> GetListOfRegistration()
         {
-            var list = new List<CourseRegistration>();
             using (var context = new PRN231_DemoCMSContext())
             {
-                list = context.CourseRegistrations.ToList();
+                // Sử dụng Include để tải thông tin của Course và User cho mỗi CourseRegistration
+                var list = await context.CourseRegistrations
+                    .Include(cr => cr.Course)
+                    .Include(cr => cr.User)
+                    .ToListAsync();
+
+                return list;
             }
-            return list ?? new();
         }
 
         internal static async Task<bool> RegisterCourse(RegistrationAddUpdateDTO courseRegistration)
@@ -36,5 +41,7 @@ namespace Infrastructures.DataAccess
                 return await context.SaveChangesAsync() > 0;
             }
         }
+
+      
     }
 }
