@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BusinessObject.Models
 {
@@ -7,7 +8,7 @@ namespace BusinessObject.Models
     {
         public CourseRegistration()
         {
-            Sections = new HashSet<Section>();
+            Uploads = new HashSet<Upload>();
         }
 
         public int RegistrationId { get; set; }
@@ -19,6 +20,8 @@ namespace BusinessObject.Models
 
         public virtual Course? Course { get; set; }
         public virtual User? User { get; set; }
-        public virtual ICollection<Section> Sections { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<Upload> Uploads { get; set; }
     }
 }

@@ -22,7 +22,6 @@ namespace CMS.Client.Controllers
             var userJson = HttpContext.Session.GetString("user");
             if (string.IsNullOrEmpty(userJson))
             {
-                // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
                 return RedirectToAction("Login", "Authenticate");
             }
 
@@ -239,6 +238,30 @@ namespace CMS.Client.Controllers
                 return RedirectToAction("Index");
             }
         }
+
+        public async Task<IActionResult> Registration(int id)
+        {
+            var courseRegistrations = new List<CourseRegistration>(); // Thay đổi thành List<CourseRegistration>
+
+            using (HttpClient client = new HttpClient())
+            {
+                using (HttpResponseMessage responseMessage = await client.GetAsync("https://localhost:7149/api/Registrations/" + id))
+                {
+                    using (HttpContent content = responseMessage.Content)
+                    {
+                        string data = await content.ReadAsStringAsync();
+                        courseRegistrations = JsonConvert.DeserializeObject<List<CourseRegistration>>(data); // Sửa đổi ở đây
+                    }
+                }
+            }
+
+            // Đối với một số trường hợp, bạn có thể muốn chỉ lấy phần tử đầu tiên trong danh sách
+            var courseRegistration = courseRegistrations.FirstOrDefault();
+
+            return View(courseRegistration);
+        }
+
+
 
     }
 }

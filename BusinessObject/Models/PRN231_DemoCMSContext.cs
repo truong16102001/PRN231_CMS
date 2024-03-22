@@ -20,7 +20,6 @@ namespace BusinessObject.Models
         public virtual DbSet<CourseRegistration> CourseRegistrations { get; set; } = null!;
         public virtual DbSet<File> Files { get; set; } = null!;
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
-        public virtual DbSet<Section> Sections { get; set; } = null!;
         public virtual DbSet<Upload> Uploads { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
@@ -95,16 +94,6 @@ namespace BusinessObject.Models
                     .HasConstraintName("FK__RefreshTo__UserI__45F365D3");
             });
 
-            modelBuilder.Entity<Section>(entity =>
-            {
-                entity.Property(e => e.SectionName).HasMaxLength(100);
-
-                entity.HasOne(d => d.Registration)
-                    .WithMany(p => p.Sections)
-                    .HasForeignKey(d => d.RegistrationId)
-                    .HasConstraintName("FK__Sections__Regist__3E52440B");
-            });
-
             modelBuilder.Entity<Upload>(entity =>
             {
                 entity.Property(e => e.UploadName).HasMaxLength(100);
@@ -116,10 +105,10 @@ namespace BusinessObject.Models
                     .HasForeignKey(d => d.FileId)
                     .HasConstraintName("FK__FileUploa__FileI__440B1D61");
 
-                entity.HasOne(d => d.Section)
+                entity.HasOne(d => d.Registration)
                     .WithMany(p => p.Uploads)
-                    .HasForeignKey(d => d.SectionId)
-                    .HasConstraintName("FK__FileUploa__Secti__4316F928");
+                    .HasForeignKey(d => d.RegistrationId)
+                    .HasConstraintName("FK_Uploads_RegistrationId");
             });
 
             modelBuilder.Entity<User>(entity =>

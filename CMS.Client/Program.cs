@@ -1,5 +1,4 @@
-﻿using CMS.Client.Commons;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -8,7 +7,6 @@ builder.Services.AddSession();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<CommonFunctions>();
 //// Ví dụ cấu hình CORS trong ASP.NET Core
 builder.Services.AddCors(options =>
 {

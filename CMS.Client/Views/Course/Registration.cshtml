@@ -1,0 +1,122 @@
+﻿@{
+    ViewData["Title"] = "Registration";
+}
+
+@{
+    Layout = null;
+}
+
+@using BusinessObject.Models;
+@model CourseRegistration
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Registration</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+
+    <style>
+        #page {
+            margin-top: 4.5rem !important;
+        }
+    </style>
+</head>
+<body class="sb-nav-fixed">
+    @await Html.PartialAsync("~/Views/Shared/Header.cshtml")
+    <div id="layoutSidenav">
+        <div id="page-wrapper">
+            <div id="page" class="container-fluid mt-4">
+                <header id="page-header" class="row">
+                    <div class="col-12 pt-3 pb-3">
+                        <div class="card ">
+                            <div class="card-body ">
+                                <div class="d-flex">
+                                    <div class="mr-auto">
+                                        <div class="page-context-header">
+                                            <div class="page-header-headings">
+                                                <h2>@Model.EditedCourseName</h2>
+                                                <p style="font-size:smaller">@Model.EditedCourseDescription</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-wrap">
+                                    <div id="page-navbar">
+                                        <nav role="navigation" aria-label="Breadcrumb trail">
+                                            <ol class="breadcrumb">
+                                                <li class="breadcrumb-item">
+                                                    <a href="/">Home</a>
+                                                </li>
+                                                <li class="breadcrumb-item">My courses</li>
+                                                <li class="breadcrumb-item">
+                                                    <a href="/Course/Registration?id=@Model.RegistrationId" aria-current="page">@Model.EditedCourseName</a>
+                                                </li>
+                                            </ol>
+                                        </nav>
+                                    </div>
+                                    <div class="ml-auto d-flex">
+                                    </div>
+                                    <div id="course-header">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <div id="page-content" class="row">
+                    <div id="region-main-box" class="col-12">
+                        <section id="region-main" class="has-blocks mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <button type="button" id="btnAdd" class="btn btn-primary mr-2">+AddFile</button>
+                                    <h3>Your Uploads</h3>
+                                    <div>
+                                        <div class="mod-indent-outer">
+                                            <div class="mod-indent"></div>
+                                            <div style="display: flex">
+                                                <div class="activityinstance">
+                                                    <a class="" onclick="" href="https://cmshn.fpt.edu.vn/mod/assign/view.php?id=153782">
+                                                        <img src="https://cmshn.fpt.edu.vn/theme/image.php/trema/assign/1697438386/icon"
+                                                             class="iconlarge activityicon" alt="" role="presentation" aria-hidden="true">
+                                                        <span class="instancename">
+                                                            Computer project (TrungDT)
+                                                            <span class="accesshide "> Assignment</span>
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                                <span class="actions">
+                                                    <form method="post" action="https://cmshn.fpt.edu.vn/course/togglecompletion.php" class="togglecompletion">
+                                                        <div>
+                                                            <input type="hidden" name="id" value="153782">
+                                                            <input type="hidden" name="sesskey" value="Kw0RbiUeZI">
+                                                            <input type="hidden" name="modulename" value="Computer project (TrungDT)">
+                                                            <input type="hidden" name="completionstate" value="1">
+                                                            <button class="btn btn-link" aria-live="assertive">
+                                                                <img class="icon " alt="Not completed: Computer project (TrungDT). Select to mark as complete." title="Not completed: Computer project (TrungDT). Select to mark as complete." src="https://cmshn.fpt.edu.vn/theme/image.php/trema/core/1697438386/i/completion-manual-n">
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

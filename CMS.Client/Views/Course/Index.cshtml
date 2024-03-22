@@ -22,14 +22,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
-
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
-
-
-
     <style>
 
 
@@ -112,7 +104,7 @@
             }
             @if (!string.IsNullOrEmpty(userJson))
             {
-                @Html.Partial("~/Views/Shared/Leftboard.cshtml")
+                @Html.Partial("~/views/Shared/Leftboard.cshtml")
 
                 var user = Newtonsoft.Json.JsonConvert.DeserializeObject<User>(userJson);
 
@@ -196,13 +188,15 @@
                                                 var userId = @user.UserId;
 
                                                 var isRegistered = false;
-
+                                                var registrationId = -1;
                                                 // Duyệt qua từng bản ghi trong registrationsForCourse
                                                 foreach (var registration in registrationsForCourse)
                                                 {
+                                                    registrationId = -1;
                                                     // Nếu có bản ghi có userId bằng với userId của người dùng
                                                     if (registration.UserId == userId)
                                                     {
+                                                        registrationId = registration.RegistrationId;
                                                         // Gán isRegistered thành true
                                                         isRegistered = true;
                                                         // Thoát khỏi vòng lặp vì đã tìm thấy bản ghi có userId của người dùng
@@ -214,7 +208,7 @@
                                                 if (isRegistered)
                                                 {
                                                     <button type="button" class="btn btn-outline-success" style="height:40px; width:150px;"
-                                        onclick="handleGoToCourse('@course.CourseId')">
+                                        onclick="handleGoToCourse('@registrationId')">
                                                         Go To Course
                                                     </button>
                                                 }
@@ -292,7 +286,7 @@
     </div>
 
     @*add modal*@
-    <div class="modal" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="editModel" aria-hidden="true">
+    <div class="modal" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="modalAdd" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -357,14 +351,17 @@
     </script>
 
     <script>
+
         function clearInput() {
             document.getElementById("myInput1").value = "";
         }
     </script>
 
     <script>
+
+        
         function handleGoToCourse(courseId) {
-            window.location.href = "/Course/Detail/" + courseId;
+            window.location.href = "/Course/Registration?id=" + courseId;
         }
 
         function handleRegisterClicked(courseId) {
@@ -383,11 +380,11 @@
                         $('#editedCourseName').val(data.courseName);
                         $('#editedCourseDescription').val(data.courseDescription);
                         $('input[name=CourseId]').val(courseId);
-                        // Hiển thị modal "Enroll"
-                        $('#enrollModal').modal('show');
+
+                                         
+                        $("#enrollModal").modal("show");
                     },
                     error: function () {
-                        // Xử lý lỗi nếu không thể lấy được dữ liệu khóa học
                         alert('Error occurred while retrieving course information.');
                     }
                 });
@@ -402,15 +399,11 @@
     <script>
         //load add modal
         $("#btnAdd").click(function () {
+            
             $("#modalAdd").modal("show");
             // Gọi API để lấy danh sách Categories và điền vào dropdown
             loadColors("#color-select", "F0F8FF");
         });
-
-        function htmlDecode(input) {
-            var doc = new DOMParser().parseFromString(input, "text/html");
-            return doc.documentElement.textContent;
-        }
 
         //add
         $("#btnInsert").click(function () {

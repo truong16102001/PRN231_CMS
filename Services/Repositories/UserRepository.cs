@@ -18,5 +18,9 @@ namespace Infrastructures.Repositories
 
         public async Task<User> Login(LoginModel req) => await UserDAO.Login(req);
 
+        public async Task<bool> UpdateUserAsync(UserEditDTO userEditDTO)
+        {
+            return await UserDAO.UpdateProfile(userEditDTO);
+        }
     }
 }

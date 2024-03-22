@@ -19,9 +19,10 @@ namespace Infrastructures.DataAccess
                 var list = await context.CourseRegistrations
                     .Include(cr => cr.Course)
                     .Include(cr => cr.User)
+                   .Include(cr => cr.Uploads)
                     .ToListAsync();
 
-                return list;
+                return (IEnumerable<CourseRegistration>)list;
             }
         }
 
@@ -31,17 +32,17 @@ namespace Infrastructures.DataAccess
             {
                 CourseRegistration pub = new CourseRegistration
                 {
-                    CourseId= courseRegistration.CourseId,
-                    UserId= courseRegistration.UserId,
-                    RegistedTime= courseRegistration.RegistedTime,
-                    EditedCourseName= courseRegistration.EditedCourseName,
-                    EditedCourseDescription= courseRegistration.EditedCourseDescription
+                    CourseId = courseRegistration.CourseId,
+                    UserId = courseRegistration.UserId,
+                    RegistedTime = courseRegistration.RegistedTime,
+                    EditedCourseName = courseRegistration.EditedCourseName,
+                    EditedCourseDescription = courseRegistration.EditedCourseDescription
                 };
                 await context.CourseRegistrations.AddAsync(pub);
                 return await context.SaveChangesAsync() > 0;
             }
         }
 
-      
+
     }
 }

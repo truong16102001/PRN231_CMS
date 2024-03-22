@@ -19,7 +19,6 @@ namespace BusinessObject.Models
         public DateTime? CreatedTime { get; set; }
 
         public virtual User? Creator { get; set; }
-
         [JsonIgnore]
         public virtual ICollection<CourseRegistration> CourseRegistrations { get; set; }
     }

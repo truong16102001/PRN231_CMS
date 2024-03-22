@@ -13,5 +13,6 @@ namespace Infrastructures.Interfaces
     {
         Task GetUserById(int? userId);
         Task<User> Login(LoginModel req);
+        Task<bool> UpdateUserAsync(UserEditDTO userEditDTO);
     }
 }

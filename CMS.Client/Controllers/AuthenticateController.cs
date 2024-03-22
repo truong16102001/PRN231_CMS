@@ -1,6 +1,5 @@
 ﻿using BusinessObject.DTO;
 using BusinessObject.Models;
-using CMS.Client.Commons;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -17,14 +16,12 @@ namespace CMS.Client.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly HttpClient client = null;
-        private readonly CommonFunctions _commonFunctions;
-        public AuthenticateController(IConfiguration configuration, CommonFunctions commonFunctions)
+        public AuthenticateController(IConfiguration configuration)
         {
             client = new HttpClient();
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
             _configuration = configuration;
-            _commonFunctions = commonFunctions;
         }
 
         [HttpGet]
@@ -39,7 +36,6 @@ namespace CMS.Client.Controllers
             LoginModel us = new LoginModel();
             us.Email = email;
             us.Password = password;
-            // var response = _commonFunctions.PostData("https://localhost:7149/api/Authenticates/login", JsonConvert.SerializeObject(us));
 
             using (HttpClient client = new HttpClient())
             {
@@ -70,6 +66,8 @@ namespace CMS.Client.Controllers
                             return Redirect(historyUrl);
                         }
                         historyUrl = "/";
+                        HttpContext.Session.SetString("historyUrl", historyUrl);
+
                         return Redirect(historyUrl);
                     }
                     else
@@ -99,7 +97,6 @@ namespace CMS.Client.Controllers
                     HttpOnly = true,
                     SameSite = SameSiteMode.Strict
                 });
-
         }
 
 

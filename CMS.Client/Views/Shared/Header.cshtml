@@ -8,8 +8,9 @@
 
 @{
     var cookies = Context.Request.Cookies;
-
 }
+
+@Html.Partial("~/Views/Shared/Notifications.cshtml")
 
 <nav class="sb-topnav navbar navbar-expand navbar-light bg-light fixed-top">
     <div class="container-fluid ">
@@ -33,6 +34,7 @@
 
                 @{
                     var userJson = Context.Session.GetString("user");
+
 
                     var refreshTokenExpiration_raw = Context.Request.Cookies["refreshTokenExpires"];
                     var refreshTokenExpiration = DateTime.Now;
@@ -64,12 +66,13 @@
                                     <span class="font-weight-bold" style="font-size: 16px"> @user.fullName</span>
                                 </button>
                                 <ul class="dropdown-menu menuScroll">
-                                    <li class="nav-item ">
-                                        <a href="/Accounts/Profile" class="text-black">
-                                            <i class="fa fa-user" aria-hidden="true"></i> Profile
-                                        </a>
+                                    <li class="nav-item">
+                                        <div class="dropdown-item" id="userProfileBtn" style="cursor:pointer"
+                                     onclick="showUserProfileModal()">
+                                            Profile
+                                        </div>
                                     </li>
-                                    <li>
+                                    <li class="nav-item">
                                         <a class="dropdown-item" href="Authenticate/Logout">Đăng xuất</a>
                                     </li>
                                 </ul>
@@ -86,7 +89,75 @@
     </div>
 </nav>
 
+
+<!-- user profile -->
+<div class="modal" id="userProfileModal" tabindex="-1" role="dialog" aria-labelledby="editModel" aria-hidden="true">
+    @{
+        var userJsonEdit = Context.Session.GetString("user");
+        dynamic userEdit = null;
+        if (userJsonEdit != null)
+        {
+            userEdit = Newtonsoft.Json.JsonConvert.DeserializeObject(userJsonEdit);
+        }
+    }
+    @if (userEdit != null)
+    {
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 10px; margin-top: 100px;  min-width: 1100px; margin-left: -320px;">
+                <div class="modal-header">
+                    <h2 style="text-align:center; font-family: Arial"><b style="padding-left: 400px;"> Thông tin cá nhân</b></h2><br>
+                </div>
+
+                <div class="modal-body">
+                    <section>
+                        <div class="container">
+                            <div class="row">
+
+                                <div class="col-md-6">
+                                    <div class="p-3 py-5">
+                                        <form action="/Home/EditProfile" method="post" enctype="multipart/form-data">
+
+                                            <div class="row mt-4">
+                                                <div class="row mt-4 col-md-6">
+                                                    <label class="labels" style="font-size: 10px;">Họ và tên<b class="ic">*</b></label>
+                                                    <input type="text" class="form-control" name="fullName" placeholder="Họ và tên" required value="@userEdit.fullName">
+                                                </div>&nbsp;
+                                                <div class="row mt-4 col-md-6">
+                                                    <label class="labels" style="font-size: 10px;">Email<b class="ic">*</b></label>
+                                                    <input type="text" class="form-control" name="email" placeholder="Email" required value="@userEdit.email">
+                                                </div>&nbsp;
+                                                <input type="hidden" name="userId" value="@userEdit.userId" />
+                                            </div>
+
+                                            <div class="row mt-5 col-md-6 text-center">
+                                                <button class="btn btn-dark" type="submit">Lưu</button>
+                                            </div>
+                                        </form>
+                                        <div class="row mt-5 col-md-6 text-center d-flex ">
+                                            <a type="button" href="/" data-toggle="modal"
+                                           data-dismiss="modal" style="padding-left: 150px; text-decoration: none;
+                                            border-radius: 100px;">
+                                                Quay về
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+
 <script>
+
+    function showUserProfileModal() {
+        $("#userProfileModal").modal("show");
+    }
 
 
     function getCookieValueByName(name) {
@@ -95,7 +166,7 @@
     {
         <text>"@cookie.Key": "@cookie.Value", </text>
     }
-                                                };
+                                                    };
 
     // Kiểm tra xem cookie có tồn tại không
     if (cookies[name]) {
@@ -105,7 +176,7 @@
     } else {
         return null; // Trả về null nếu không tìm thấy cookie
     }
-                                            }
+                                                }
 
 
 
