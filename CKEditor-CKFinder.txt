@@ -1,0 +1,10 @@
+//Các bước cấu hình CKEditor
+    B1: Tải bộ plugin vào mục wwwroot của project
+    B2: Kéo file js vào _layout.cshtml và @RenderSection("DoanJS", false); ở ngay bên dưới
+    B3: Tạo thẻ textarea  và đánh id sau đó thêm đoạn code js ở dưới
+         @section DoanJS{
+        <script>
+            CKEDITOR.replace('UploadDescriptionId')
+        </script>
+    }
+    B4: Lưu dữ liệu như bthg

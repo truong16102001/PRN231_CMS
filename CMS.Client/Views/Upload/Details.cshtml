@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Upload Details";
+}
+@using BusinessObject.Models
+@model BusinessObject.Models.Upload
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Upload Details</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+
+    <style>
+        #page {
+            margin-top: 4.5rem !important;
+        }
+    </style>
+</head>
+
+<body class="sb-nav-fixed">
+    <div id="layoutSidenav">
+        <div id="page" class="container-fluid mt-4">
+            <header id="page-header" class="row">
+                <h2 style="color:white; font-weight: bold">Details of Upload</h2>
+
+                <div class="col-12 pt-3 pb-3">
+                    <form action="/Upload/Edit" method="post">
+                        <div class="form-group">
+                            <label for="uploadId2" style="color:white">Upload Id</label>
+                            <input type="text" id="uploadId2" readonly class="form-control" name="UploadId" value="@Model.UploadId">
+                        </div>
+                        <div class="form-group">
+                            <label for="RegistrationId2" style="color:white">Registration Id</label>
+                            <input type="text" id="RegistrationId2" readonly class="form-control" name="RegistrationId" value="@Model.RegistrationId">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail2" style="color:white">Upload Name</label>
+                            <input type="text" class="form-control" value="@Model.UploadName" name="UploadName" id="exampleInputEmail2">
+                        </div>
+                        <div class="form-group">
+                            <label for="UploadDescriptionId2" style="color:white">Upload Description</label>
+                            <textarea class="form-control" id="UploadDescriptionId2" name="UploadDescription">@Model.UploadDescription</textarea>
+                        </div>
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" checked="@Model.IsHide" id="exampleCheck2" name="IsHide">
+                            <label class="form-check-label" for="exampleCheck2" style="color:white">Is Hide?</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Edit</button>
+                    </form>
+                </div>
+            </header>
+        </div>
+    </div>
+    <a href="/Course/Registration?id=@Model.RegistrationId">Quay về</a>
+    @section DoanJS{
+        <script>
+            CKEDITOR.replace('UploadDescriptionId2')
+        </script>
+    }
+     <script>
+       // Lắng nghe sự kiện thay đổi của checkbox
+        document.getElementById('exampleCheck2').addEventListener('change', function () {
+            // Nếu checkbox được chọn, thiết lập giá trị của nó thành true
+            // Nếu không, giữ nguyên giá trị của nó là false
+            this.value = this.checked ? 'true' : 'false';
+        });
+    </script>
+</body>
+</html>

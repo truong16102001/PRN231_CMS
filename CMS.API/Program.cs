@@ -45,6 +45,8 @@ builder.Services.AddScoped(typeof(ITokenService), typeof(TokenService));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped(typeof(ICourseRepository), typeof(CourseRepository));
 builder.Services.AddScoped(typeof(IRegistrationRepository), typeof(RegistrationRepository));
+builder.Services.AddScoped(typeof(IUploadRepository), typeof(UploadRepository));
+
 
 
 

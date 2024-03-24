@@ -241,8 +241,9 @@ namespace CMS.Client.Controllers
 
         public async Task<IActionResult> Registration(int id)
         {
-            var courseRegistrations = new List<CourseRegistration>(); // Thay đổi thành List<CourseRegistration>
+            var courseRegistrations = new List<CourseRegistration>();
 
+            var uploads = new List<Upload>();
             using (HttpClient client = new HttpClient())
             {
                 using (HttpResponseMessage responseMessage = await client.GetAsync("https://localhost:7149/api/Registrations/" + id))
@@ -253,11 +254,21 @@ namespace CMS.Client.Controllers
                         courseRegistrations = JsonConvert.DeserializeObject<List<CourseRegistration>>(data); // Sửa đổi ở đây
                     }
                 }
+
+                using (HttpResponseMessage responseMessage = await client.GetAsync("https://localhost:7149/api/Uploads/GetUploadsByRegistrationId/" + id))
+                {
+                    using (HttpContent content = responseMessage.Content)
+                    {
+                        string data = await content.ReadAsStringAsync();
+                        uploads = JsonConvert.DeserializeObject<List<Upload>>(data); // Sửa đổi ở đây
+                    }
+                }
             }
 
             // Đối với một số trường hợp, bạn có thể muốn chỉ lấy phần tử đầu tiên trong danh sách
             var courseRegistration = courseRegistrations.FirstOrDefault();
-
+            ViewBag.Uploads = uploads;
+            HttpContext.Session.SetString("historyUrl", "https://localhost:7008/Course/Registration?id=" + id);
             return View(courseRegistration);
         }
 

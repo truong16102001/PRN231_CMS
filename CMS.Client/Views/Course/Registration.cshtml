@@ -19,10 +19,7 @@
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
 
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
 
     <style>
         #page {
@@ -32,6 +29,7 @@
 </head>
 <body class="sb-nav-fixed">
     @await Html.PartialAsync("~/Views/Shared/Header.cshtml")
+    @Html.Partial("~/Views/Shared/Notifications.cshtml")
     <div id="layoutSidenav">
         <div id="page-wrapper">
             <div id="page" class="container-fluid mt-4">
@@ -77,35 +75,45 @@
                         <section id="region-main" class="has-blocks mb-3">
                             <div class="card">
                                 <div class="card-body">
-                                    <button type="button" id="btnAdd" class="btn btn-primary mr-2">+AddFile</button>
+                                    <a type="button" id="btnAdd" href="/Upload/Add?RegistrationId=@Model.RegistrationId" class="btn btn-primary mr-2">+Add New Uploads</a>
                                     <h3>Your Uploads</h3>
                                     <div>
                                         <div class="mod-indent-outer">
                                             <div class="mod-indent"></div>
                                             <div style="display: flex">
                                                 <div class="activityinstance">
-                                                    <a class="" onclick="" href="https://cmshn.fpt.edu.vn/mod/assign/view.php?id=153782">
-                                                        <img src="https://cmshn.fpt.edu.vn/theme/image.php/trema/assign/1697438386/icon"
-                                                             class="iconlarge activityicon" alt="" role="presentation" aria-hidden="true">
-                                                        <span class="instancename">
-                                                            Computer project (TrungDT)
-                                                            <span class="accesshide "> Assignment</span>
-                                                        </span>
-                                                    </a>
-                                                </div>
-                                                <span class="actions">
-                                                    <form method="post" action="https://cmshn.fpt.edu.vn/course/togglecompletion.php" class="togglecompletion">
-                                                        <div>
-                                                            <input type="hidden" name="id" value="153782">
-                                                            <input type="hidden" name="sesskey" value="Kw0RbiUeZI">
-                                                            <input type="hidden" name="modulename" value="Computer project (TrungDT)">
-                                                            <input type="hidden" name="completionstate" value="1">
-                                                            <button class="btn btn-link" aria-live="assertive">
-                                                                <img class="icon " alt="Not completed: Computer project (TrungDT). Select to mark as complete." title="Not completed: Computer project (TrungDT). Select to mark as complete." src="https://cmshn.fpt.edu.vn/theme/image.php/trema/core/1697438386/i/completion-manual-n">
-                                                            </button>
+                                                    @foreach (var upload in ViewBag.Uploads)
+                                                    {
+                                                        <div class="row mb-2">
+                                                            <div class="col-md-9">
+                                                                <a class="" onclick="" href="/Upload/Details?uploadId=@upload.UploadId">
+                                                                    <img src="https://cmshn.fpt.edu.vn/theme/image.php/trema/assign/1697438386/icon"
+                                                                     class="iconlarge activityicon" alt="" role="presentation" aria-hidden="true">
+                                                                    <span class="instancename">
+                                                                        @upload.UploadName
+                                                                    </span>
+                                                                </a>
+                                                                <br />
+                                                                <small>Last Edited: <i>@upload.UploadTime</i></small>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <form id="editForm_@upload.UploadId" method="post" action="/Upload/Edit" class="togglecompletion">
+                                                                    <div class="form-check">
+                                                                        <input type="hidden" name="UploadId" value="@upload.UploadId" />
+                                                                        <input type="hidden" name="RegistrationId" value="@upload.RegistrationId" />
+                                                                        <input type="hidden" name="UploadName" value="@upload.UploadName" />
+                                                                        <input type="hidden" name="UploadDescription" value="@upload.UploadDescription" />
+                                                                        <input class="form-check-input is-hide-checkbox" name="IsHide" type="checkbox" checked="@upload.IsHide" 
+                                                                        value="@upload.IsHide" id="isHide_@upload.UploadId">
+                                                                        <label class="form-check-label" for="isHide_@upload.UploadId">
+                                                                            IsHide?
+                                                                        </label>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
                                                         </div>
-                                                    </form>
-                                                </span>
+                                                    }
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -117,6 +125,30 @@
             </div>
         </div>
     </div>
+    <script>
+        $('.is-hide-checkbox').change(function () {
+            var checkbox = $(this);
+            var uploadId = checkbox.attr('id').replace('isHide_', '');
+            var form = $('#editForm_' + uploadId);
+
+            if (checkbox.is(':checked')) {
+                if (confirm('Are you sure you want to hide this upload?')) {
+                    checkbox.val('true');
+                    form.submit();
+                } else{
+                    checkbox.val('false');
+                }
+            } else {
+                if (confirm('Are you sure you want to unhide this upload?')) {
+                    checkbox.val('false');
+                    form.submit();
+                } else{
+                    checkbox.val('true');
+                }
+            }
+        });
+    </script>
+
 </body>
 </html>
 

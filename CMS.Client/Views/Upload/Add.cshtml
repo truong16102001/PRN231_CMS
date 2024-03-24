@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Add Upload";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Registration</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+
+    <style>
+        #page {
+            margin-top: 4.5rem !important;
+        }
+    </style>
+</head>
+
+<body class="sb-nav-fixed">
+    <div id="layoutSidenav">
+        <div id="page" class="container-fluid mt-4">
+            <header id="page-header" class="row">
+                <h2 style="color:white; font-weight: bold">Add new Upload</h2>
+
+                <div class="col-12 pt-3 pb-3">
+                    <form action="/Upload/Add" method="post">
+                        <input type="hidden" class="form-control" name="RegistrationId" value="@ViewBag.RegistrationId">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1" style="color:white">Upload Name</label>
+                            <input type="text" class="form-control" name="UploadName" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter UploadName">
+                        </div>
+                        <div class="form-group">
+                            <label for="UploadDescriptionId" style="color:white">Upload Description</label>
+                            <textarea class="form-control" id="UploadDescriptionId" name="UploadDescription"></textarea>
+                        </div>
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="exampleCheck1" name="IsHide">
+                            <label class="form-check-label" for="exampleCheck1" style="color:white">Is Hide?</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </header>
+        </div>
+    </div>
+    <a href="/Course/Registration?id=@ViewBag.RegistrationId">Quay về</a>
+    @section DoanJS{
+        <script>
+            CKEDITOR.replace('UploadDescriptionId')
+        </script>
+    }
+    <script>
+        // Lắng nghe sự kiện thay đổi của checkbox
+        document.getElementById('exampleCheck1').addEventListener('change', function () {
+            // Nếu checkbox được chọn, thiết lập giá trị của nó thành true
+            // Nếu không, giữ nguyên giá trị của nó là false
+            this.value = this.checked ? 'true' : '';
+        });
+    </script>
+</body>
+</html>

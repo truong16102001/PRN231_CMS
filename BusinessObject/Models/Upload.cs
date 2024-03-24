@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BusinessObject.Models
 {
@@ -14,6 +15,7 @@ namespace BusinessObject.Models
         public bool? IsHide { get; set; }
 
         public virtual File? File { get; set; }
+        [JsonIgnore]
         public virtual CourseRegistration? Registration { get; set; }
     }
 }

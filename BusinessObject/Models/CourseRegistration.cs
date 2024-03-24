@@ -21,7 +21,6 @@ namespace BusinessObject.Models
         public virtual Course? Course { get; set; }
         public virtual User? User { get; set; }
 
-        [JsonIgnore]
         public virtual ICollection<Upload> Uploads { get; set; }
     }
 }
