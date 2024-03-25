@@ -12,7 +12,7 @@ namespace Infrastructures.Interfaces
     {
         Task<bool> AddUpload(Upload newCourse);
         Task<Upload> GetUploadById(int uploadId);
-        Task<IEnumerable<Upload>> GetUploadsByRegistrationId(int registrationId);
+        Task<List<Upload>> GetUploadsByRegistrationId(int registrationId);
         Task<bool> UpdateUpload(UploadAddUpdateDTO uploadAddUpdateDTO);
     }
 }

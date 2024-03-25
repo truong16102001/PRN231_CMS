@@ -16,5 +16,8 @@ namespace BusinessObject.DTO
         public DateTime? UploadTime { get; set; }
         public bool? IsHide { get; set; }
 
+        public bool? IsGeneral { get; set; }
+
+
     }
 }

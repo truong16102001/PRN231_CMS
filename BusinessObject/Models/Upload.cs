@@ -13,8 +13,10 @@ namespace BusinessObject.Models
         public string? UploadDescription { get; set; }
         public DateTime? UploadTime { get; set; }
         public bool? IsHide { get; set; }
+        public bool? IsGeneral { get; set; }
 
         public virtual File? File { get; set; }
+
         [JsonIgnore]
         public virtual CourseRegistration? Registration { get; set; }
     }

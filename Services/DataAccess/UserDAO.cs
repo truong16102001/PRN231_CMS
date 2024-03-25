@@ -22,6 +22,45 @@ namespace Infrastructures.DataAccess
             return account ?? new();
         }
 
+        internal static async Task<bool> Add(UserAddEditDTO userEditDTO)
+        {
+            User user = new User
+            {
+                FullName = userEditDTO.FullName,
+                Email = userEditDTO.Email,
+                Password = userEditDTO.Password,
+                Role = "teacher"
+            };
+            try
+            {
+                using (var context = new PRN231_DemoCMSContext())
+                {
+                    // Add the new course to the context
+                    context.Users.Add(user);
+
+                    return await context.SaveChangesAsync() > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error here
+                Console.WriteLine("Error adding user: " + ex.Message);
+                return false; // Return false if there's an error adding the course
+            }
+        }
+
+        internal static async Task<bool> CheckEmailExist(string email)
+        {
+            using (var context = new PRN231_DemoCMSContext())
+            {
+                // Kiểm tra xem có bất kỳ người dùng nào có địa chỉ email như vậy trong cơ sở dữ liệu hay không
+                bool emailExists = await context.Users.AnyAsync(a => a.Email == email);
+
+                return emailExists;
+            }
+        }
+
+
         internal static async Task<User> GetUserByUserId(int? userId)
         {
             User? account;
@@ -57,7 +96,7 @@ namespace Infrastructures.DataAccess
                     context.Users.Update(existingUser);
                     await context.SaveChangesAsync();
                     return true;
-                    
+
                 }
                 else
                 {

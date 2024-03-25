@@ -22,7 +22,7 @@ namespace Infrastructures.Repositories
             return UploadDAO.GetById(uploadId);
         }
 
-        public Task<IEnumerable<Upload>> GetUploadsByRegistrationId(int registrationId)
+        public Task<List<Upload>> GetUploadsByRegistrationId(int registrationId)
         {
             return UploadDAO.GetByRegistrationId(registrationId);
         }

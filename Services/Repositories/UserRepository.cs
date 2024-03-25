@@ -13,6 +13,16 @@ namespace Infrastructures.Repositories
 {
     public class UserRepository : IUserRepository
     {
+        public async Task<bool> AddUserAsync(UserAddEditDTO userEditDTO)
+        {
+            return await UserDAO.Add(userEditDTO);
+        }
+
+        public async Task<bool> EmailExistsAsync(string email)
+        {
+            return await UserDAO.CheckEmailExist(email);
+        }
+
         public async Task GetUserById(int? userId) => await UserDAO.GetUserByUserId(userId);
 
 

@@ -6,7 +6,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 
@@ -85,6 +87,102 @@ namespace CMS.Client.Controllers
                     }
                 }
             }
+        }
+
+        [HttpGet]
+        public IActionResult Signup()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SignupAsync(UserAddEditDTO userAddEditDTO)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                using (HttpResponseMessage responseMessage = await client.GetAsync("https://localhost:7149/api/Users/CheckEmailExist?email=" + userAddEditDTO.Email))
+                {
+                    if (responseMessage.IsSuccessStatusCode)
+                    {
+                        string responseContent = await responseMessage.Content.ReadAsStringAsync();
+                        bool emailExists = JsonConvert.DeserializeObject<bool>(responseContent);
+                        if (emailExists)
+                        {
+                            // Nếu email đã tồn tại trong hệ thống, thông báo cho người dùng
+                            Dictionary<string, string> notificationData = new Dictionary<string, string>();
+                            notificationData["Type"] = "alert-danger";
+                            notificationData["Message"] = "Email already exists!";
+                            string notificationJson = JsonConvert.SerializeObject(notificationData);
+                            HttpContext.Session.SetString("Notification", notificationJson);
+                            return Redirect("/Authenticate/Signup");
+                        }
+                        else
+                        {
+
+                            using (HttpResponseMessage addUserResponse = await client.PostAsJsonAsync("https://localhost:7149/api/Users", userAddEditDTO))
+                            {
+                                if (addUserResponse.IsSuccessStatusCode)
+                                {
+                                    string from = "truongndhe150878@fpt.edu.vn";
+                                    string fromPassword = "bqdyxdqjxujnayti";
+                                    MailMessage message = new MailMessage();
+                                    message.From = new MailAddress(from);
+                                    message.Subject = "Sign up Account";
+                                    message.To.Add(new MailAddress(userAddEditDTO.Email));
+                                    message.Body = "<html><body>Signup success!</body></html>";
+                                    message.IsBodyHtml = true;
+
+                                    var smtpClient = new SmtpClient("smtp.gmail.com")
+                                    {
+                                        Port = 587,
+                                        Credentials = new NetworkCredential(from, fromPassword),
+                                        EnableSsl = true
+                                    };
+                                    smtpClient.Send(message);
+
+                                    Dictionary<string, string> notificationData = new Dictionary<string, string>();
+                                    notificationData["Type"] = "alert-success"; // hoặc "danger" tùy vào loại alert
+                                    notificationData["Message"] = "Signup success!";
+                                    // Chuyển đổi Dictionary thành một chuỗi JSON để lưu vào session
+                                    string notificationJson = JsonConvert.SerializeObject(notificationData);
+
+                                    // Lưu chuỗi JSON vào session
+                                    HttpContext.Session.SetString("Notification", notificationJson);
+                                    return Redirect("/Authenticate/Login");
+
+                                }
+                                else
+                                {
+                                    Dictionary<string, string> notificationData = new Dictionary<string, string>();
+                                    notificationData["Type"] = "alert-danger"; // hoặc "danger" tùy vào loại alert
+                                    notificationData["Message"] = "Signup failed! Invalid email or password222";
+                                    // Chuyển đổi Dictionary thành một chuỗi JSON để lưu vào session
+                                    string notificationJson = JsonConvert.SerializeObject(notificationData);
+
+                                    // Lưu chuỗi JSON vào session
+                                    HttpContext.Session.SetString("Notification", notificationJson);
+                                    return Redirect("/Authenticate/Signup");
+                                }
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        Dictionary<string, string> notificationData = new Dictionary<string, string>();
+                        notificationData["Type"] = "alert-danger"; // hoặc "danger" tùy vào loại alert
+                        notificationData["Message"] = "Signup failed! Invalid email or password";
+                        // Chuyển đổi Dictionary thành một chuỗi JSON để lưu vào session
+                        string notificationJson = JsonConvert.SerializeObject(notificationData);
+
+                        // Lưu chuỗi JSON vào session
+                        HttpContext.Session.SetString("Notification", notificationJson);
+
+                        return Redirect("/Authenticate/Login");
+                    }
+                }
+            }
+
         }
 
         public void SetCookies(string variable, string value, DateTime expires)

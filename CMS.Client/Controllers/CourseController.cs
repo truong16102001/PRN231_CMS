@@ -26,11 +26,11 @@ namespace CMS.Client.Controllers
             }
 
             var historyUrl = "/Course";
-            if(!string.IsNullOrEmpty(filterType+"") && filterType != -1)
+            if (!string.IsNullOrEmpty(filterType + "") && filterType != -1)
             {
                 historyUrl += "?filterType=" + filterType;
             }
-            
+
 
             string apiUrl = DefaultCourseApiUrl;
 
@@ -132,8 +132,8 @@ namespace CMS.Client.Controllers
                 CourseId = courseRegistrationDTO.CourseId,
                 UserId = user.UserId,
                 RegistedTime = DateTime.Now,
-                EditedCourseName = courseRegistrationDTO.EditedCourseName??"",
-                EditedCourseDescription= courseRegistrationDTO.EditedCourseDescription??""
+                EditedCourseName = courseRegistrationDTO.EditedCourseName ?? "",
+                EditedCourseDescription = courseRegistrationDTO.EditedCourseDescription ?? ""
             };
 
             using (HttpClient client = new HttpClient())
@@ -203,7 +203,7 @@ namespace CMS.Client.Controllers
                 CourseName = courseAddUpdateDTO.CourseName,
                 CourseDescription = courseAddUpdateDTO.CourseDescription,
                 Image = courseAddUpdateDTO.Image,
-                CreatorId = user.UserId               
+                CreatorId = user.UserId
             };
 
             using (HttpClient client = new HttpClient())
@@ -248,20 +248,32 @@ namespace CMS.Client.Controllers
             {
                 using (HttpResponseMessage responseMessage = await client.GetAsync("https://localhost:7149/api/Registrations/" + id))
                 {
-                    using (HttpContent content = responseMessage.Content)
+                    if (responseMessage.IsSuccessStatusCode)
                     {
-                        string data = await content.ReadAsStringAsync();
-                        courseRegistrations = JsonConvert.DeserializeObject<List<CourseRegistration>>(data); // Sửa đổi ở đây
+                        using (HttpContent content = responseMessage.Content)
+                        {
+                            string data = await content.ReadAsStringAsync();
+                            courseRegistrations = JsonConvert.DeserializeObject<List<CourseRegistration>>(data); // Sửa đổi ở đây
+                        }
                     }
+
                 }
 
                 using (HttpResponseMessage responseMessage = await client.GetAsync("https://localhost:7149/api/Uploads/GetUploadsByRegistrationId/" + id))
                 {
-                    using (HttpContent content = responseMessage.Content)
+                    if (responseMessage.IsSuccessStatusCode)
                     {
-                        string data = await content.ReadAsStringAsync();
-                        uploads = JsonConvert.DeserializeObject<List<Upload>>(data); // Sửa đổi ở đây
+                        using (HttpContent content = responseMessage.Content)
+                        {
+                            string data = await content.ReadAsStringAsync();
+                            if (!string.IsNullOrEmpty(data))
+                            {
+                                uploads = JsonConvert.DeserializeObject<List<Upload>>(data); // Sửa đổi ở đây
+
+                            }
+                        }
                     }
+
                 }
             }
 

@@ -53,13 +53,18 @@ namespace Infrastructures.DataAccess
         }
 
 
-        internal static async Task<IEnumerable<Upload>> GetByRegistrationId(int registrationId)
+        internal static async Task<List<Upload>> GetByRegistrationId(int registrationId)
         {
+            List<Upload> uploads = new List<Upload>();
             try
             {
                 using (var context = new PRN231_DemoCMSContext())
                 {
-                    var uploads = await context.Uploads.Where(u => u.RegistrationId == registrationId).ToListAsync();
+                     uploads = await context.Uploads.Where(u => u.RegistrationId == registrationId).ToListAsync();
+                    if(uploads == null || uploads.Count == 0)
+                    {
+                        return new List<Upload>();
+                    }
                     return uploads;
                 }
             }
